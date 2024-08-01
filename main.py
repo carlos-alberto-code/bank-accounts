@@ -1,5 +1,6 @@
 import flet as ft
-from view.view import shape_content
+from view.table_accounts import TableAccounts
+from view.options import add_button, edit_button, delete_button, searcher
 
 def main(page: ft.Page):
 
@@ -9,13 +10,17 @@ def main(page: ft.Page):
     page.theme = ft.Theme(color_scheme_seed='green')
 
     page.appbar = ft.AppBar(
-        title=ft.Text('Cuentas'),
+        title=searcher,
         center_title=True,
+        actions=[
+            add_button, edit_button, delete_button, ft.Container(width=10)
+        ],
+        elevation=50,
+        toolbar_height=50,
     )
 
     page.add(
-        ft.Divider(),
-        shape_content
+        TableAccounts()
     )
 
 ft.app(target=main)

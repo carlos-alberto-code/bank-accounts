@@ -8,11 +8,6 @@ def create_data_column(label: str, on_sort=None) -> ft.DataColumn:
         on_sort=on_sort
     )
 
-def create_data_row(cells: list[ft.DataCell]) -> ft.DataRow:
-    return ft.DataRow(
-        cells=cells,
-    )
-
 def create_snackbar(message: str) -> ft.SnackBar:
     return ft.SnackBar(
         content=ft.Row([ft.Text(message)], alignment=ft.MainAxisAlignment.CENTER),
@@ -24,74 +19,42 @@ def show_message(event: ft.ControlEvent) -> None:
     page: ft.Page = event.page
     page.overlay.append(snackbar)
     page.update()
-    
 
 def handle_on_click_cell(event: ft.ControlEvent) -> None:
     page: ft.Page = event.page
-
     page.set_clipboard(str(event.control.content.controls[0].value))
     show_message(event)
 
-# Ejecución 
 
-accounts = Accounts()
-
-table_account_colums: list[ft.DataColumn] = [
-    create_data_column(
-        label=column,
-        on_sort=lambda e: print(e.control.data)
-    ) for column in accounts.column_names
-]
-
-table_account_rows: list[ft.DataRow] = []
-for index, row in accounts.rows:
-    table_account_rows.append(
-        create_data_row(
-            cells=[
-                ft.DataCell(
-                    ft.Row(
-                        [ft.Text(row['Apellido Paterno'])],
-                        alignment=ft.MainAxisAlignment.START
-                    )
-                ),
-                ft.DataCell(
-                    ft.Row(
-                        [ft.Text(row['Apellido Materno'])],
-                        alignment=ft.MainAxisAlignment.START
-                    )
-                ),
-                ft.DataCell(
-                    ft.Row(
-                        [ft.Text(row['Nombres'])],
-                        alignment=ft.MainAxisAlignment.START
-                    )
-                ),
-                ft.DataCell(
-                    ft.Row(
-                        [
-                            ft.Text(row['Numero de Cuenta'], tooltip='Copiar Cuenta'),
-                            ft.Icon(ft.icons.COPY, size=15)
-                        ],
-                        alignment=ft.MainAxisAlignment.START
-                    )
-                ),
+class TableAccounts(ft.DataTable):
+    def __init__(self):
+        self._accounts = Accounts()
+        super().__init__(
+            data_text_style=ft.TextStyle(size=14),
+            border_radius=10,
+            border=ft.border.all(width=1),
+            horizontal_lines=ft.BorderSide(width=1),
+            vertical_lines=ft.BorderSide(width=1),
+            columns=[
+                create_data_column(
+                    label=column,
+                    on_sort=lambda e: print('Ordenado')
+                ) for column in self._accounts.column_names
+            ],
+            rows=[
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(row['Apellido Paterno'])),
+                        ft.DataCell(ft.Text(row['Apellido Materno'])),
+                        ft.DataCell(ft.Text(row['Nombres'])),
+                        ft.DataCell(
+                            ft.Row(
+                                [ft.Text(row['Numero de Cuenta']), ft.Icon(ft.icons.COPY)],
+                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            ),
+                            on_tap=handle_on_click_cell
+                        )
+                    ]
+                ) for index, row in self._accounts.rows
             ]
         )
-    )
-
-table = ft.DataTable(
-    columns=table_account_colums,
-    rows=table_account_rows,
-    # expand=True,
-    data_text_style=ft.TextStyle(
-        size=14,
-    ),
-    border_radius=10,
-    border=ft.border.all(width=1),
-    horizontal_lines=ft.BorderSide(width=1),
-    vertical_lines=ft.BorderSide(width=1)
-)
-if table.rows:
-    for row in table.rows:
-        cell = row.cells[-1]
-        cell.on_tap = handle_on_click_cell

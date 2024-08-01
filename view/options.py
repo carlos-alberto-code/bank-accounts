@@ -1,5 +1,4 @@
 import flet as ft
-from view.table_accounts import table
 
 def handle_on_submit(event: ft.ControlEvent):
     banner.open = False
@@ -16,6 +15,7 @@ searcher = ft.TextField(
     prefix_icon=ft.icons.SEARCH,
     label='Buscar usuario o cuenta',
     border_radius=12,
+    width=300,
     height=40,
     text_size=13,
     label_style=ft.TextStyle(size=13),
@@ -57,18 +57,4 @@ add_button = ft.IconButton(
 delete_button = ft.IconButton(
     ft.icons.DELETE, icon_size=20,
     tooltip='Eliminar',
-)
-
-
-shape_content = ft.Container(
-    content=ft.ResponsiveRow(
-        controls=[
-            ft.Row(
-                [ft.MenuBar(
-                    [search_button, add_button, edit_button, delete_button]
-                )],alignment=ft.MainAxisAlignment.CENTER,
-            ),
-            table
-        ]
-    )
 )

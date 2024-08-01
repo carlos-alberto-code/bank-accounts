@@ -41,10 +41,14 @@ class Accounts:
         self._df.to_csv(filepath, index=False)
 
     @property
+    def total_accounts(self) -> int:
+        return len(self._df)
+    
+    @property
     def column_names(self) -> list[str]:
         return list(self._df.columns)
     
     @property
-    def total_accounts(self) -> int:
-        return len(self._df)
+    def rows(self):
+        return self._df.iterrows()
     

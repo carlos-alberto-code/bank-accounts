@@ -44,7 +44,7 @@ table_account_colums: list[ft.DataColumn] = [
 ]
 
 table_account_rows: list[ft.DataRow] = []
-for index, row in accounts._df.iterrows():
+for index, row in accounts.rows:
     table_account_rows.append(
         create_data_row(
             cells=[

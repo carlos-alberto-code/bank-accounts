@@ -3,7 +3,7 @@ from data.accounts import Accounts
 
 def create_data_column(label: str, on_sort=None) -> ft.DataColumn:
     return ft.DataColumn(
-        label=ft.Text(label),
+        label=ft.Row([ft.Text(label, text_align=ft.TextAlign.CENTER)], alignment=ft.MainAxisAlignment.CENTER),
         tooltip=f'Ordenar por {label.lower()}',
         on_sort=on_sort
     )
@@ -19,7 +19,6 @@ def create_snackbar(message: str) -> ft.SnackBar:
     )
 
 def show_message(event: ft.ControlEvent) -> None:
-    account_num = event.control.content.value
     snackbar = create_snackbar(f'Número de cuenta copiado!')
     snackbar.open = True
     page: ft.Page = event.page
@@ -29,7 +28,8 @@ def show_message(event: ft.ControlEvent) -> None:
 
 def handle_on_click_cell(event: ft.ControlEvent) -> None:
     page: ft.Page = event.page
-    page.set_clipboard(str(event.control.content.value))
+
+    page.set_clipboard(str(event.control.content.controls[0].value))
     show_message(event)
 
 # Ejecución 
@@ -48,17 +48,48 @@ for index, row in accounts.rows:
     table_account_rows.append(
         create_data_row(
             cells=[
-                ft.DataCell(ft.Text(row['Apellido Paterno'])),
-                ft.DataCell(ft.Text(row['Apellido Materno'])),
-                ft.DataCell(ft.Text(row['Nombres'])),
-                ft.DataCell(ft.Text(row['Numero de Cuenta'], tooltip='Haz click para copiar el numero de cuenta')),
+                ft.DataCell(
+                    ft.Row(
+                        [ft.Text(row['Apellido Paterno'])],
+                        alignment=ft.MainAxisAlignment.START
+                    )
+                ),
+                ft.DataCell(
+                    ft.Row(
+                        [ft.Text(row['Apellido Materno'])],
+                        alignment=ft.MainAxisAlignment.START
+                    )
+                ),
+                ft.DataCell(
+                    ft.Row(
+                        [ft.Text(row['Nombres'])],
+                        alignment=ft.MainAxisAlignment.START
+                    )
+                ),
+                ft.DataCell(
+                    ft.Row(
+                        [
+                            ft.Text(row['Numero de Cuenta'], tooltip='Copiar Cuenta'),
+                            ft.Icon(ft.icons.COPY, size=15)
+                        ],
+                        alignment=ft.MainAxisAlignment.START
+                    )
+                ),
             ]
         )
     )
 
 table = ft.DataTable(
     columns=table_account_colums,
-    rows=table_account_rows
+    rows=table_account_rows,
+    # expand=True,
+    data_text_style=ft.TextStyle(
+        size=14,
+    ),
+    border_radius=10,
+    border=ft.border.all(width=1),
+    horizontal_lines=ft.BorderSide(width=1),
+    vertical_lines=ft.BorderSide(width=1)
 )
 if table.rows:
     for row in table.rows:

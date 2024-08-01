@@ -9,7 +9,6 @@ searcher = ft.TextField(
     text_size=13,
     label_style=ft.TextStyle(size=13),
 )
-
 edit_button = ft.IconButton(
     ft.icons.EDIT, icon_size=20,
     tooltip='Editar',

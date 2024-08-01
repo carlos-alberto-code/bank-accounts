@@ -50,7 +50,7 @@ class TableAccounts(ft.DataTable):
                         ft.DataCell(ft.Text(row['Nombres'])),
                         ft.DataCell(
                             ft.Row(
-                                [ft.Text(row['Numero de Cuenta']), ft.Icon(ft.icons.COPY)],
+                                [ft.Text(row['Numero de Cuenta']), ft.Icon(ft.icons.COPY, size=15)],
                                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                             ),
                             on_tap=_handle_on_click_cell

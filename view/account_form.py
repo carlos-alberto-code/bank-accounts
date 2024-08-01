@@ -1,4 +1,10 @@
 import flet as ft
+from data.accounts import Accounts
+
+class FormController:
+    def __init__(self) -> None:
+        self.accounts = Accounts()
+        
 
 class Form(ft.AlertDialog):
 
@@ -53,12 +59,12 @@ class Form(ft.AlertDialog):
         )
     
     def handle_on_clean(self, event: ft.ControlEvent):
-        self.restet()
+        self.reset()
         self._apellido_paterno.focus()
         self.update()
     
     def handle_on_cancel(self, event: ft.ControlEvent):
-        self.restet()
+        self.reset()
         self.open = False
         self.update()
     
@@ -73,7 +79,7 @@ class Form(ft.AlertDialog):
             autofocus=autofocus
         )
     
-    def restet(self):
+    def reset(self):
         self._apellido_paterno.value = ''
         self._apellido_materno.value = ''
         self._nombres.value = ''

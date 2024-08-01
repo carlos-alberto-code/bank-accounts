@@ -52,3 +52,6 @@ class Accounts:
     def rows(self):
         return self._df.iterrows()
     
+    def search(self, search_term: str) -> pd.DataFrame:
+        search_results = self._df[self._df.apply(lambda row: row.astype(str).str.contains(search_term, case=False, na=False).any(), axis=1)]
+        return pd.DataFrame(search_results)

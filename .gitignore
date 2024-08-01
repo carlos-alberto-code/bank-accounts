@@ -1,0 +1,37 @@
+# Ignorar archivos y directorios generados por el sistema operativo
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de configuración local
+.env
+
+# Ignorar archivos de dependencias y paquetes
+/node_modules
+/vendor
+
+# Ignorar archivos de compilación y construcción
+/build
+/dist
+
+# Ignorar archivos de registro y salida
+/logs
+*.log
+
+# Ignorar archivos de respaldo y temporales
+*.bak
+*.tmp
+
+# Ignorar archivos de IDE y editores de texto
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Ignorar archivos de caché
+.cache
+
+# Ignorar carpetas  __pycache__
+__pycache__/
+.vscode/
+
+test_accounts.py

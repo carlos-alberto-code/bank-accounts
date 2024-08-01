@@ -1,9 +1,9 @@
 import flet as ft
-from data.accounts import Accounts
+from data.accounts_dataframe import AccountsDataFrame
 
 class FormController:
     def __init__(self) -> None:
-        self.accounts = Accounts()
+        self.accounts = AccountsDataFrame()
         
 
 class Form(ft.AlertDialog):

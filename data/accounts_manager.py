@@ -1,5 +1,5 @@
 from typing         import List
-from data.accounts  import Accounts
+from data.accounts_dataframe  import AccountsDataFrame
 from dataclasses    import dataclass
 
 @dataclass
@@ -12,7 +12,7 @@ class Customer:
 class AccountsManager:
 
     def __init__(self) -> None:
-        self.accounts = Accounts()
+        self.accounts = AccountsDataFrame()
 
     def add_customer(self, customer: Customer) -> None:
         account_data = {

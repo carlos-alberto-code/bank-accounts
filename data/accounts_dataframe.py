@@ -1,10 +1,10 @@
 import os
 import pandas as pd
 
-class Accounts:
+class AccountsDataFrame:
 
     def __init__(self) -> None:
-        self._filepath = 'data/.accounts.csv'
+        self._filepath = 'data/accounts.csv'
         if not os.path.exists(self._filepath):
             raise FileNotFoundError(f"Archivo no encontrado en el directorio: {self._filepath}\n")
         self._df = pd.read_csv(self._filepath)

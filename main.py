@@ -10,6 +10,7 @@ def main(page: ft.Page):
     page.theme = ft.Theme(color_scheme_seed='green')
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.scroll = ft.ScrollMode.AUTO
     page.update()
 
 ft.app(target=main)

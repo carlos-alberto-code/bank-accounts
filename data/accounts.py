@@ -1,0 +1,50 @@
+import os
+import pandas as pd
+
+class Accounts:
+
+    def __init__(self) -> None:
+        self._FILEPATH = 'data/accounts.csv'
+        if not os.path.exists(self._FILEPATH):
+            raise FileNotFoundError(f"Archivo no encontrado en el directorio: {self._FILEPATH}\n")
+        self._df = pd.read_csv(self._FILEPATH)
+
+    def add_account(
+            self,
+            apellido_paterno: str,
+            apellido_materno: str,
+            nombres: str,
+            numero_de_cuenta: str
+    ) -> None:
+        if numero_de_cuenta in self._df['Numero de Cuenta'].astype(str).values:
+            raise ValueError(f"Numero de Cuenta: {numero_de_cuenta} ya existe en la base de datos\n")
+        new_account = {
+            'Apellido Paterno': apellido_paterno,
+            'Apellido Materno': apellido_materno,
+            'Nombres': nombres,
+            'Numero de Cuenta': numero_de_cuenta
+        }
+        self._df.loc[len(self._df)] = pd.Series(new_account)
+        self._save_to_csv()
+
+    def remove_account(self, numero_de_cuenta: str) -> None:
+        self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
+        if numero_de_cuenta not in self._df['Numero de Cuenta'].values:
+            raise ValueError(f"Numero de Cuenta: {numero_de_cuenta} no existe en la base de datos\n")
+        self._df = self._df[self._df['Numero de Cuenta'] != numero_de_cuenta]
+        self._save_to_csv()
+
+    def _save_to_csv(self) -> None:
+        self._df.to_csv(self._FILEPATH, index=False)
+    
+    def export_to_csv(self, filepath: str) -> None:
+        self._df.to_csv(filepath, index=False)
+
+    @property
+    def column_names(self) -> list[str]:
+        return list(self._df.columns)
+    
+    @property
+    def total_accounts(self) -> int:
+        return len(self._df)
+    

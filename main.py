@@ -4,10 +4,23 @@ from view.appbar_actions import add_button, edit_button, delete_button, searcher
 
 def main(page: ft.Page):
 
+    def handle_on_add_button_click(event: ft.ControlEvent):
+        print('add')
+
+    def handle_on_edit_button_click(event: ft.ControlEvent):
+        print('edit')
+
+    def handle_on_delete_button_click(event: ft.ControlEvent):
+        print('delete')
+
     page.theme_mode           = ft.ThemeMode.LIGHT
     page.vertical_alignment   = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.theme                = ft.Theme(color_scheme_seed='green')
+
+    add_button.on_click       = handle_on_add_button_click
+    edit_button.on_click      = handle_on_edit_button_click
+    delete_button.on_click    = handle_on_delete_button_click
 
     page.appbar = ft.AppBar(
         title=searcher,

@@ -76,3 +76,7 @@ class TableAccounts(ft.DataTable):
     
     def delete_account(self, account_numer: str):
         self._accounts.remove_account(account_number=account_numer)
+    
+    @property
+    def total_accounts(self) -> int:
+        return self._accounts.total_accounts

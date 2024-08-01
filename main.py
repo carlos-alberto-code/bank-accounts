@@ -4,7 +4,7 @@ from view.appbar_actions import add_button, edit_button, delete_button, searcher
 
 def main(page: ft.Page):
 
-    page.theme_mode           =  ft.ThemeMode.LIGHT
+    page.theme_mode           = ft.ThemeMode.LIGHT
     page.vertical_alignment   = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.theme                = ft.Theme(color_scheme_seed='green')
@@ -19,8 +19,14 @@ def main(page: ft.Page):
         toolbar_height=50,
     )
 
+    table_accounts = TableAccounts()
+    total_accounts = ft.Text(f'Existen {table_accounts.total_accounts} cuentas en total'.capitalize())
     page.add(
-        TableAccounts()
+        ft.Row(
+            [total_accounts],
+            alignment=ft.MainAxisAlignment.CENTER
+        ),
+        table_accounts
     )
 
 ft.app(target=main)

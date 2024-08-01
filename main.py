@@ -1,11 +1,18 @@
 import flet as ft
+from view.account_form   import Form
 from view.table_accounts import TableAccounts
 from view.appbar_actions import add_button, edit_button, delete_button, searcher
 
 def main(page: ft.Page):
 
+    def handle_on_save_form(event: ft.ControlEvent):
+        pass
+
     def handle_on_add_button_click(event: ft.ControlEvent):
-        print('add')
+        form.restet()
+        form.open = True
+        page.overlay.append(form)
+        page.update()
 
     def handle_on_edit_button_click(event: ft.ControlEvent):
         print('edit')
@@ -21,6 +28,8 @@ def main(page: ft.Page):
     add_button.on_click       = handle_on_add_button_click
     edit_button.on_click      = handle_on_edit_button_click
     delete_button.on_click    = handle_on_delete_button_click
+
+    form = Form(on_save=handle_on_save_form)
 
     page.appbar = ft.AppBar(
         title=searcher,

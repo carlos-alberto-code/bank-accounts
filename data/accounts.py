@@ -27,11 +27,11 @@ class Accounts:
         self._df.loc[len(self._df)] = pd.Series(new_account)
         self._save_to_csv()
 
-    def remove_account(self, numero_de_cuenta: str) -> None:
+    def remove_account(self, account_number: str) -> None:
         self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
-        if numero_de_cuenta not in self._df['Numero de Cuenta'].values:
-            raise ValueError(f"Numero de Cuenta: {numero_de_cuenta} no existe en la base de datos\n")
-        self._df = self._df[self._df['Numero de Cuenta'] != numero_de_cuenta]
+        if account_number not in self._df['Numero de Cuenta'].values:
+            raise ValueError(f"Numero de Cuenta: {account_number} no existe en la base de datos\n")
+        self._df = self._df[self._df['Numero de Cuenta'] != account_number]
         self._save_to_csv()
 
     def _save_to_csv(self) -> None:

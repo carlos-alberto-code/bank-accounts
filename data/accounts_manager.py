@@ -22,6 +22,9 @@ class AccountsManager:
             'Numero de Cuenta': customer.account_number
         }
         self._accounts.add(account_data)
+    
+    def get(self):
+        pass
 
     def remove(self, account_number: str) -> None:
         self._accounts.remove(account_number)

@@ -24,6 +24,7 @@ class AccountsTable(ft.DataTable):
     def __init__(self, column_names: list[str], customers: list[Customer]) -> None:
         self._customers: list[Customer] = customers
         self._column_names: list[str] = column_names
+        self._sort_columns_states: dict[str, bool] = {column_name.lower(): False for column_name in self._column_names}
         super().__init__(
             data_text_style=ft.TextStyle(size=14),
             border_radius=10,
@@ -77,10 +78,11 @@ class AccountsTable(ft.DataTable):
             'nombres': lambda customer: customer.nombres,
             'numero de cuenta': lambda customer: customer.numero_de_cuenta,
         }
-        col_name: str = event.control.label.value
+        col_name: str = event.control.label.value.lower()
         if col_name.lower() in sorts:
-            sort = sorts[event.control.label.value.lower()]
-            self._customers.sort(key=sort)
+            sort = sorts[col_name]
+            self._sort_columns_states[col_name] = not self._sort_columns_states[col_name]
+            self._customers.sort(key=sort, reverse=self._sort_columns_states[col_name])
             self.rows = self._create_rows()
             self.update()
     

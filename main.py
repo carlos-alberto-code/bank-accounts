@@ -1,5 +1,4 @@
 import flet as ft
-from data.accounts_manager import AccountsManager, Customer
 from controllers.accounts_view_controller import AccountsViewController
 
 def main(page: ft.Page):

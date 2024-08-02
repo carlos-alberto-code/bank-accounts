@@ -17,7 +17,7 @@ class Form(ft.AlertDialog):
             label='Apellido Materno', input_filter=ft.TextOnlyInputFilter(),
         )
         self._nombres = self._create_txt_field(
-            label='Nombres', input_filter=ft.TextOnlyInputFilter(), # TODO: Permitir espacio en blanco
+            label='Nombres', input_filter=ft.InputFilter(regex_string=r'^[A-Za-z\s]+$')
         )
         self._cuenta = self._create_txt_field(
             label='Número de cuenta', input_filter=ft.NumbersOnlyInputFilter()

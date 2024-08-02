@@ -4,10 +4,10 @@ from data.accounts_dataframe  import AccountsDataFrame
 
 @dataclass
 class Customer:
-    paternal_surname: str
-    maternal_surname: str
-    names: str
-    account_number: str
+    apellido_paterno: str
+    apellido_materno: str
+    nombres: str
+    numero_de_cuenta: str
 
 class AccountsManager:
 
@@ -16,15 +16,18 @@ class AccountsManager:
 
     def add(self, customer: Customer) -> None:
         account_data = {
-            'Apellido Paterno': customer.paternal_surname,
-            'Apellido Materno': customer.maternal_surname,
-            'Nombres': customer.names,
-            'Numero de Cuenta': customer.account_number
+            'Apellido Paterno': customer.apellido_paterno,
+            'Apellido Materno': customer.apellido_materno,
+            'Nombres': customer.nombres,
+            'Numero de Cuenta': customer.numero_de_cuenta
         }
         self._accounts.add(account_data)
     
     def get(self):
         pass
+
+    def get_all(self) -> List[Customer]:
+        return [Customer(row['Apellido Paterno'], row['Apellido Materno'], row['Nombres'], row['Numero de Cuenta']) for _, row in self._accounts.rows]
 
     def remove(self, account_number: str) -> None:
         self._accounts.remove(account_number)

@@ -1,7 +1,7 @@
 import flet as ft
 
 from components.account_form      import Form
-from components.table_accounts    import TableAccounts
+from components.accounts_table    import AccountsTable
 from data.accounts_manager        import AccountsManager
 from components.appbar_actions    import add_button, delete_button, edit_button, searcher
 
@@ -10,7 +10,10 @@ class AccountsViewController:
         self.page = page
         self.accounts = AccountsManager()
         self.form = Form()
-        self.table_accounts = TableAccounts()
+        self.table_accounts = AccountsTable(
+            column_names=self.accounts.columns,
+            customers=self.accounts.get_all()
+        )
     
     def setup_appbar(self):
         self.page.appbar = ft.AppBar(

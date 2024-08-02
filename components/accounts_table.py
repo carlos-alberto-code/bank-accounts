@@ -58,12 +58,12 @@ class AccountsTable(ft.DataTable):
         return [
             ft.DataRow(
                 cells=[
-                    ft.DataCell(ft.Text(customer.apellido_paterno)),
-                    ft.DataCell(ft.Text(customer.apellido_materno)),
-                    ft.DataCell(ft.Text(customer.nombres)),
+                    ft.DataCell(ft.Text(customer.apellido_paterno, size=13)),
+                    ft.DataCell(ft.Text(customer.apellido_materno, size=13)),
+                    ft.DataCell(ft.Text(customer.nombres, size=13)),
                     ft.DataCell(
                         ft.Row(
-                            [ft.Text(customer.numero_de_cuenta), ft.Icon(ft.icons.COPY)],
+                            [ft.Text(customer.numero_de_cuenta, size=13), ft.Icon(ft.icons.COPY, size=13)],
                         ),
                         on_tap=_handle_on_click_cell,
                     ),

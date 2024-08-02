@@ -21,10 +21,10 @@ class AccountsManager:
             'Nombres': customer.names,
             'Numero de Cuenta': customer.account_number
         }
-        self.accounts.add_account(account_data)
+        self.accounts.add(account_data)
 
     def remove_customer(self, account_number: str) -> None:
-        self.accounts.remove_account(account_number)
+        self.accounts.remove(account_number)
 
     def get_total_customers(self) -> int:
         return self.accounts.total_accounts

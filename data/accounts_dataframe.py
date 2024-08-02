@@ -9,13 +9,13 @@ class AccountsDataFrame:
             raise FileNotFoundError(f"Archivo no encontrado en el directorio: {self._filepath}\n")
         self._df = pd.read_csv(self._filepath)
 
-    def add_account(self, account_data: dict) -> None:
+    def add(self, account_data: dict) -> None:
         if account_data['Numero de Cuenta'] in self._df['Numero de Cuenta'].astype(str).values:
             raise ValueError(f"Numero de Cuenta: {account_data['Numero de Cuenta']} ya existe en la base de datos\n")
         self._df.loc[len(self._df)] = pd.Series(account_data)
         self._save_to_csv()
 
-    def remove_account(self, account_number: str) -> None:
+    def remove(self, account_number: str) -> None:
         self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
         if account_number not in self._df['Numero de Cuenta'].values:
             raise ValueError(f"Numero de Cuenta: {account_number} no existe en la base de datos\n")

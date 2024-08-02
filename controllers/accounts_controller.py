@@ -1,14 +1,14 @@
 import flet as ft
 
-from view.account_form   import Form
-from data.accounts_dataframe       import AccountsDataFrame
-from view.table_accounts import TableAccounts
-from view.appbar_actions import add_button, delete_button, edit_button, searcher
+from view.account_form      import Form
+from view.table_accounts    import TableAccounts
+from data.accounts_manager  import AccountsManager
+from view.appbar_actions    import add_button, delete_button, edit_button, searcher
 
 class AccountController:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.accounts = AccountsDataFrame()
+        self.accounts = AccountsManager()
         self.form = Form()
         self.table_accounts = TableAccounts()
     
@@ -58,5 +58,5 @@ class AccountController:
         print('\n\n')
         txt_field: ft.TextField = event.control
         search_term = str(txt_field.value).strip()
-        results = self.accounts.search(search_term)
+        results = self.accounts.search_customers(search_term)
         print(results)

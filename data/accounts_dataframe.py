@@ -31,13 +31,9 @@ class AccountsDataFrame:
     def search(self, search_term: str) -> pd.DataFrame:
         search_results = self._df[self._df.apply(lambda row: row.astype(str).str.contains(search_term, case=False, na=False).any(), axis=1)]
         return search_results
-
-    @property
-    def total_accounts(self) -> int:
-        return len(self._df)
     
     @property
-    def column_names(self) -> list[str]:
+    def columns(self) -> list[str]:
         return list(self._df.columns)
     
     @property

@@ -1,9 +1,9 @@
 import flet as ft
 
-from view.account_form      import Form
-from view.table_accounts    import TableAccounts
-from data.accounts_manager  import AccountsManager
-from view.appbar_actions    import add_button, delete_button, edit_button, searcher
+from components.account_form      import Form
+from components.table_accounts    import TableAccounts
+from data.accounts_manager        import AccountsManager
+from components.appbar_actions    import add_button, delete_button, edit_button, searcher
 
 class AccountsViewController:
     def __init__(self, page: ft.Page):

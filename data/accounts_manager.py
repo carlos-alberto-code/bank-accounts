@@ -32,6 +32,6 @@ class AccountsManager:
     def get_column_names(self) -> List[str]:
         return self.accounts.column_names
 
-    def search_customers(self, search_term: str) -> List[Customer]:
+    def search(self, search_term: str) -> List[Customer]:
         search_results = self.accounts.search(search_term)
         return [Customer(row['Apellido Paterno'], row['Apellido Materno'], row['Nombres'], row['Numero de Cuenta']) for _, row in search_results.iterrows()]

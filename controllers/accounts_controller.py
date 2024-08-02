@@ -55,8 +55,5 @@ class AccountController:
         print('delete')
     
     def handle_on_searcher_change(self, event: ft.ControlEvent):
-        print('\n\n')
-        txt_field: ft.TextField = event.control
-        search_term = str(txt_field.value).strip()
-        results = self.accounts.search_customers(search_term)
-        print(results)
+        text = event.control.value
+        self.table_accounts.data = self.accounts.search(text)

@@ -1,5 +1,5 @@
 import flet as ft
-from data.accounts_dataframe import AccountsDataFrame
+from data.accounts_manager import Customer
 
 def _create_data_column(label: str, on_sort=None) -> ft.DataColumn:
     return ft.DataColumn(
@@ -29,7 +29,7 @@ def _handle_on_click_cell(event: ft.ControlEvent) -> None:
 class TableAccounts(ft.DataTable):
 
     def __init__(self):
-        self._accounts = AccountsDataFrame()
+        self.data: list[Customer] = []
         super().__init__(
             data_text_style=ft.TextStyle(size=14),
             border_radius=10,

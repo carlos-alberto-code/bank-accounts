@@ -1,9 +1,9 @@
 import flet as ft
-from controllers.accounts_controller import AccountController
 from data.accounts_manager import AccountsManager, Customer
+from controllers.accounts_view_controller import AccountsViewController
 
 def main(page: ft.Page):
-    account_controller = AccountController(page)
+    account_controller = AccountsViewController(page)
     account_controller.setup_components()
 
     page.theme_mode = ft.ThemeMode.LIGHT

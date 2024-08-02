@@ -5,7 +5,7 @@ from view.table_accounts    import TableAccounts
 from data.accounts_manager  import AccountsManager
 from view.appbar_actions    import add_button, delete_button, edit_button, searcher
 
-class AccountController:
+class AccountsViewController:
     def __init__(self, page: ft.Page):
         self.page = page
         self.accounts = AccountsManager()

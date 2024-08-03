@@ -26,7 +26,7 @@ class AccountsManager:
         if not hasattr(self, '_initialized'):
             self._accounts = AccountsDataFrame()
             self._initialized = True
-
+    
     def add(self, customer: Customer) -> None:
         customer = self._normalize_customer(customer)
         valid, error_message = self._validate_customer(customer)

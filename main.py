@@ -1,5 +1,5 @@
 import flet as ft
-from controllers.accounts_view_controller import AccountsViewController
+from controllers.main_view_controller import AccountsViewController
 
 def main(page: ft.Page):
     account_controller = AccountsViewController(page)

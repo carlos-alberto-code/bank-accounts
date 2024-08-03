@@ -1,185 +1,107 @@
 import flet as ft
-from data.accounts_manager import AccountsManager
+from data.accounts_manager import AccountsManager, Customer
 
 accounts = AccountsManager()
 
-def create_txt_field(label: str, input_filter: ft.InputFilter, autofocus: bool = False, visible: bool = True) -> ft.TextField:
-    return ft.TextField(
-        label=label,
-        height=40,
-        border_radius=10,
-        text_size=13,
-        prefix_icon=ft.icons.PERSON,
-        input_filter=input_filter,
-        autofocus=autofocus,
-        visible=visible
-    )
-
-class NewCustomerForm(ft.AlertDialog):
-
+class Form(ft.AlertDialog):
     def __init__(self):
-        self._apellido_paterno = create_txt_field(
-            label='Apellido Paterno', input_filter=ft.TextOnlyInputFilter(),
-            autofocus=True
-        )
-        self._apellido_materno = create_txt_field(
-            label='Apellido Materno', input_filter=ft.TextOnlyInputFilter(),
-        )
-        self._nombres = create_txt_field(
-            label='Nombres', input_filter=ft.InputFilter(regex_string=r'^[A-Za-z\s]+$')
-        )
-        self._cuenta = create_txt_field(
-            label='Número de cuenta', input_filter=ft.NumbersOnlyInputFilter()
-        )
-        btn_style = ft.ButtonStyle(
-            shape=ft.RoundedRectangleBorder(radius=10)
-        )
-        super().__init__(
-            title=ft.Row([ft.Text('Nuevo cliente')], alignment=ft.MainAxisAlignment.CENTER),
-            content=ft.Container(
-                ft.Column(
-                    [
-                        ft.Divider(),
-                        self._apellido_paterno,
-                        self._apellido_materno,
-                        self._nombres,
-                        self._cuenta
-                    ],
-                    height=250
-                )
+        super().__init__()
+    
+    def open_form(self) -> None:
+        self.open = True
+        self.update()
+    
+    def close_form(self) -> None:
+        self.open = False
+        self.update()
+    
+    def _create_elevated_button(self, text: str, icon: str, on_click=None) -> ft.ElevatedButton:
+        return ft.ElevatedButton(
+            text=text, icon=icon,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=10)
             ),
-            actions=[
-                ft.ElevatedButton(
-                    text='Cancelar', icon=ft.icons.CANCEL,
-                    style=btn_style,
-                    on_click=self._handle_on_cancel
-                ),
-                ft.ElevatedButton(
-                    text='Limpiar', icon=ft.icons.CLEANING_SERVICES_SHARP,
-                    style=btn_style,
-                    on_click=self._handle_on_clean
-                ),
-                ft.ElevatedButton(
-                    text='Guardar', icon=ft.icons.SAVE_ALT,
-                    style=btn_style,
-                    on_click=self._handle_on_save,
-                )
-            ]
+            on_click=on_click
         )
     
-    def _handle_on_save(self, event: ft.ControlEvent):
-        pass
+    def _create_text_field(self, label: str, input_filter: ft.InputFilter, autofocus: bool = False, visible: bool = True) -> ft.TextField:
+        return ft.TextField(
+            label=label,
+            height=40,
+            border_radius=10,
+            text_size=13,
+            prefix_icon=ft.icons.PERSON,
+            input_filter=input_filter,
+            autofocus=autofocus,
+            visible=visible
+        )
+
+class NewCustomerForm(Form):
+
+    def __init__(self):
+        super().__init__()
+        self._paternal_surname = self._create_text_field(
+            label='Apellido Paterno',
+            input_filter=ft.TextOnlyInputFilter(),
+            autofocus=True
+        )
+        self._maternal_surname = self._create_text_field(
+            label='Apellido Materno',
+            input_filter=ft.TextOnlyInputFilter()
+        )
+        self._customer_names = self._create_text_field(
+            label='Nombres',
+            input_filter=ft.InputFilter(regex_string=r'^[A-Za-z\s]+$')
+        )
+        self._account_number = self._create_text_field(
+            label='Número de cuenta',
+            input_filter=ft.NumbersOnlyInputFilter()
+        )
+        self.title = ft.Row(
+            [
+                ft.Icon(ft.icons.PERSON_ADD),
+                ft.Text('Nuevo cliente', style=ft.TextStyle(size=20, weight=ft.FontWeight.BOLD))
+            ],
+            alignment=ft.MainAxisAlignment.CENTER
+        )
+        self.content = ft.ResponsiveRow(
+            [
+                ft.Divider(),
+                self._paternal_surname,
+                self._maternal_surname,
+                self._customer_names,
+                self._account_number
+            ],
+        )
+        self.actions = [
+            self._create_elevated_button('Cancelar', ft.icons.CANCEL, self._handle_on_cancel),
+            self._create_elevated_button('Limpiar', ft.icons.CLEAR_ALL_ROUNDED, self._handle_on_clean),
+            self._create_elevated_button('Guardar', ft.icons.SAVE_ALT, self._handle_on_save)
+        ]
+    
+    def reset(self):
+        self._paternal_surname.value = ''
+        self._maternal_surname.value = ''
+        self._customer_names.value = ''
+        self._account_number.value = ''
+    
+    def _handle_on_cancel(self, event: ft.ControlEvent):
+        self.reset()
+        self.open = False
+        self.update()
     
     def _handle_on_clean(self, event: ft.ControlEvent):
         self.reset()
-        self._apellido_paterno.focus()
+        self._paternal_surname.focus()
         self.update()
-    
-    def _handle_on_cancel(self, event: ft.ControlEvent):
-        self.reset()
-        self.open = False
-        self.update()
-    
-    def reset(self):
-        self._apellido_paterno.value = ''
-        self._apellido_materno.value = ''
-        self._nombres.value = ''
-        self._cuenta.value = ''
-
-
-class EditCustomerForm(ft.AlertDialog):
-
-    def __init__(self):
-        self._account_txt_field = create_txt_field(
-            label='Número de cuenta', input_filter=ft.NumbersOnlyInputFilter(),
-            autofocus=True
-        )
-        self._button_search = ft.IconButton(
-            icon=ft.icons.SEARCH,
-            icon_size=20,
-            on_click=self.handle_on_search_click
-        )
-
-        self._apellido_paterno = create_txt_field(
-            label='Apellido Paterno', input_filter=ft.TextOnlyInputFilter(),
-            autofocus=True,
-            visible=False
-        )
-        self._apellido_materno = create_txt_field(
-            label='Apellido Materno', input_filter=ft.TextOnlyInputFilter(),
-            visible=False
-        )
-        self._nombres = create_txt_field(
-            label='Nombres', input_filter=ft.InputFilter(regex_string=r'^[A-Za-z\s]+$'),
-            visible=False
-        )
-
-        super().__init__(
-            title=ft.Row([ft.Text('Editar cliente')], alignment=ft.MainAxisAlignment.CENTER),
-            content=ft.Column(
-                [
-                    ft.Divider(),
-                    ft.Row(
-                        [self._account_txt_field, self._button_search],
-                    ),
-                    ft.Divider(),
-                    self._apellido_paterno,
-                    self._apellido_materno,
-                    self._nombres
-                ],
-                width=350,
-                height=70
-            ),
-            actions=[
-                ft.ElevatedButton(
-                    text='Cancelar', icon=ft.icons.CANCEL,
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=10)
-                    ),
-                    on_click=self._handle_on_cancel
-                ),
-                ft.ElevatedButton(
-                    text='Guardar', icon=ft.icons.SAVE_ALT,
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=10)
-                    ),
-                    disabled=True,
-                    on_click=self._handle_on_save
-                )
-            ],
-            actions_alignment=ft.MainAxisAlignment.CENTER
-        )
     
     def _handle_on_save(self, event: ft.ControlEvent):
-        pass
-
-    def handle_on_search_click(self, event: ft.ControlEvent):
-        text = str(self._account_txt_field.value)
-        self.show_search_result(text)
-
-    def _handle_on_cancel(self, event: ft.ControlEvent):
+        customer = Customer(
+            apellido_paterno=str(self._paternal_surname.value),
+            apellido_materno=str(self._maternal_surname.value),
+            nombres=str(self._customer_names.value),
+            numero_de_cuenta=str(self._account_number.value)
+        )
+        accounts.add(customer)
         self.reset()
-        self.open = False
-        self.update()
-    
-    def reset(self):
-        self._account_txt_field.value = ''
-        self._apellido_paterno.value = ''
-        self._apellido_materno.value = ''
-        self._nombres.value = ''
-        self._account_txt_field.focus()
-        self._apellido_paterno.visible = False
-        self._apellido_materno.visible = False
-        self._nombres.visible = False
-        self.content.height = 70 # type: ignore
-    
-    def show_search_result(self, account_number: str):
-        customer = accounts.get(account_number)
-        self._apellido_paterno.visible = True
-        self._apellido_materno.visible = True
-        self._nombres.visible = True
-        self._apellido_paterno.value = customer.apellido_paterno
-        self._apellido_materno.value = customer.apellido_materno
-        self._nombres.value = customer.nombres
-        self.content.height = 250 # type: ignore
-        self.update()
+        self.close_form()

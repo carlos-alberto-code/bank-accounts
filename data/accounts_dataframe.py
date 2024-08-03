@@ -16,7 +16,11 @@ class AccountsDataFrame:
             self._filepath = 'data/accounts.csv'
             if not os.path.exists(self._filepath):
                 raise FileNotFoundError(f"Archivo no encontrado en el directorio: {self._filepath}\n")
-            self._df = pd.read_csv(self._filepath)
+            try:
+                self._df = pd.read_csv(self._filepath)
+            except pd.errors.EmptyDataError:
+                print(f"Archivo {self._filepath} está vacío. Creando DataFrame vacío.")
+                self._df = pd.DataFrame(columns=["Apellido Paterno", "Apellido Materno", "Nombres", "Numero de Cuenta"])
             self._initialized = True
 
     def add(self, account_data: Dict[str, str]) -> None:
@@ -24,9 +28,11 @@ class AccountsDataFrame:
             raise ValueError("Datos de cuenta incompletos")
         if account_data['Numero de Cuenta'] in self._df['Numero de Cuenta'].astype(str).values:
             raise ValueError(f"Numero de Cuenta: {account_data['Numero de Cuenta']} ya existe en la base de datos\n")
-        self._df.loc[len(self._df)] = pd.Series(account_data)
+        
+        new_row = pd.DataFrame([account_data])
+        self._df = pd.concat([self._df, new_row], ignore_index=True)
         self._save_to_csv()
-    
+
     def get(self, account_number: str) -> pd.Series:
         self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
         if account_number not in self._df['Numero de Cuenta'].values:
@@ -39,8 +45,6 @@ class AccountsDataFrame:
             raise ValueError(f"Numero de Cuenta: {account_number} no existe en la base de datos\n")
         self._df = self._df[self._df['Numero de Cuenta'] != account_number]
         self._save_to_csv()
-        if account_number in self._df['Numero de Cuenta'].values:
-            raise RuntimeError(f"Error al eliminar el Numero de Cuenta: {account_number}")
 
     def edit(self, account_number: str, new_data: Dict[str, str]) -> None:
         self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
@@ -51,12 +55,15 @@ class AccountsDataFrame:
             raise ValueError("Datos de cuenta incompletos")
         self._df.loc[index] = pd.Series(new_data)
         self._save_to_csv()
-    
+
     def _save_to_csv(self) -> None:
-        try:
-            self._df.to_csv(self._filepath, index=False)
-        except Exception as e:
-            print(f"Error al guardar en CSV: {e}")
+        if not self._df.empty:
+            try:
+                self._df.to_csv(self._filepath, index=False)
+            except Exception as e:
+                print(f"Error al guardar DataFrame en archivo CSV: {e}")
+        else:
+            raise ValueError("No se puede guardar un DataFrame vacío")
 
     def export_to_csv(self, filepath: str) -> None:
         self._df.to_csv(filepath, index=False)

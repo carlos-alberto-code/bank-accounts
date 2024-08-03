@@ -52,7 +52,10 @@ class AccountsManager:
             raise ValueError(f"Error al obtener la cuenta: {str(e)}")
 
     def get_all(self) -> List[Customer]:
-        return [Customer(row['Apellido Paterno'], row['Apellido Materno'], row['Nombres'], row['Numero de Cuenta']) for _, row in self._accounts.rows]
+        return [
+            Customer(row['Apellido Paterno'], row['Apellido Materno'], row['Nombres'], row['Numero de Cuenta'])
+            for row in self._accounts.rows
+        ]
 
     def remove(self, account_number: str) -> None:
         try:

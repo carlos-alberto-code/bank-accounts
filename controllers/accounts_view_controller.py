@@ -1,8 +1,8 @@
 import flet as ft
 
-from components.account_form      import Form
 from components.accounts_table    import AccountsTable
 from data.accounts_manager        import AccountsManager
+from components.forms             import NewCustomerForm, EditCustomerForm
 from components.appbar_actions    import add_button, delete_button, edit_button, searcher
 
 class AccountsViewController:
@@ -10,7 +10,8 @@ class AccountsViewController:
     def __init__(self, page: ft.Page):
         self.page = page
         self.accounts = AccountsManager()
-        self.form = Form()
+        self.new_customer_form = NewCustomerForm()
+        self.edit_customer_form = EditCustomerForm()
         self.table_accounts = AccountsTable(
             column_names=self.accounts.columns,
             customers=self.accounts.get_all()
@@ -44,16 +45,19 @@ class AccountsViewController:
         delete_button.on_click  = self._handle_on_delete_button_click
         searcher.on_change      = self._handle_on_searcher_change
         self._setup_appbar()
-        self.page.overlay.append(self.form)
+        self.page.overlay.append(self.new_customer_form)
+        self.page.overlay.append(self.edit_customer_form)
         self.page.add(self.table_accounts)
 
     def _handle_on_add_button_click(self, event: ft.ControlEvent):
-        self.form.reset()
-        self.form.open = True
+        self.new_customer_form.reset()
+        self.new_customer_form.open = True
         self.page.update()
     
     def _handle_on_edit_button_click(self, event: ft.ControlEvent):
-        print('edit')
+        self.edit_customer_form.reset()
+        self.edit_customer_form.open = True
+        self.page.update()
 
     def _handle_on_delete_button_click(self, event: ft.ControlEvent):
         print('delete')

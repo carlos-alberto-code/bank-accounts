@@ -23,8 +23,9 @@ class AccountsManager:
         }
         self._accounts.add(account_data)
     
-    def get(self):
-        pass
+    def get(self, account_number: str) -> Customer:
+        row = self._accounts.get(account_number)
+        return Customer(row['Apellido Paterno'], row['Apellido Materno'], row['Nombres'], row['Numero de Cuenta'])
 
     def get_all(self) -> List[Customer]:
         return [Customer(row['Apellido Paterno'], row['Apellido Materno'], row['Nombres'], row['Numero de Cuenta']) for _, row in self._accounts.rows]

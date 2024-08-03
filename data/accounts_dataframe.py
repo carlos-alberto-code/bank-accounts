@@ -14,6 +14,12 @@ class AccountsDataFrame:
             raise ValueError(f"Numero de Cuenta: {account_data['Numero de Cuenta']} ya existe en la base de datos\n")
         self._df.loc[len(self._df)] = pd.Series(account_data)
         self._save_to_csv()
+    
+    def get(self, account_number: str) -> pd.Series:
+        self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
+        if account_number not in self._df['Numero de Cuenta'].values:
+            raise ValueError(f"Numero de Cuenta: {account_number} no existe en la base de datos\n")
+        return self._df[self._df['Numero de Cuenta'] == account_number].iloc[0]
 
     def remove(self, account_number: str) -> None:
         self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)

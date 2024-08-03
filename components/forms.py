@@ -3,6 +3,17 @@ from data.accounts_manager import AccountsManager, Customer
 
 accounts = AccountsManager()
 
+class AlertConfirmation(ft.AlertDialog):
+    def __init__(self, title: str, content: ft.Control, actions: list[ft.Control]):
+        super().__init__(
+            title=ft.Row(
+                [ft.Icon(ft.icons.CONFIRMATION_NUM), ft.Text(f'{title}')],
+                alignment=ft.MainAxisAlignment.CENTER,
+            ),
+            content=content,
+            actions=actions,
+        )
+
 class Form(ft.AlertDialog):
     def __init__(self):
         super().__init__()
@@ -74,9 +85,9 @@ class NewCustomerForm(Form):
             ],
         )
         self.actions = [
-            self._create_elevated_button('Cancelar', ft.icons.CANCEL, self._handle_on_cancel),
-            self._create_elevated_button('Limpiar', ft.icons.CLEAR_ALL_ROUNDED, self._handle_on_clean),
-            self._create_elevated_button('Guardar', ft.icons.SAVE_ALT, self._handle_on_save)
+            self._create_elevated_button('Cancelar', ft.icons.CANCEL, self._handle_on_cancel_click),
+            self._create_elevated_button('Limpiar', ft.icons.CLEAR_ALL_ROUNDED, self._handle_on_clean_click),
+            self._create_elevated_button('Guardar', ft.icons.SAVE_ALT, self._handle_on_save_click)
         ]
     
     def reset(self):
@@ -85,23 +96,41 @@ class NewCustomerForm(Form):
         self._customer_names.value = ''
         self._account_number.value = ''
     
-    def _handle_on_cancel(self, event: ft.ControlEvent):
+    def _handle_on_cancel_click(self, event: ft.ControlEvent):
         self.reset()
         self.open = False
         self.update()
     
-    def _handle_on_clean(self, event: ft.ControlEvent):
+    def _handle_on_clean_click(self, event: ft.ControlEvent):
         self.reset()
         self._paternal_surname.focus()
         self.update()
     
-    def _handle_on_save(self, event: ft.ControlEvent):
+    def _handle_on_save_click(self, event: ft.ControlEvent):
         customer = Customer(
             apellido_paterno=str(self._paternal_surname.value),
             apellido_materno=str(self._maternal_surname.value),
             nombres=str(self._customer_names.value),
             numero_de_cuenta=str(self._account_number.value)
         )
-        accounts.add(customer)
-        self.reset()
-        self.close_form()
+        if self._data_exist:
+            self.alert_confirmation = AlertConfirmation(
+                title='Confirmación',
+                actions=[
+                    self._create_elevated_button('Cancelar', ft.icons.CANCEL, self._handle_on_cancel_click_in_alert),
+                    self._create_elevated_button('Confirmar', ft.icons.SAVE),
+                ],
+                content=ft.Text(f'Asegurate de que los datos sean correctos:\nNombre completo: {customer.apellido_paterno.capitalize()} {customer.apellido_materno.capitalize()} {customer.nombres.capitalize()}\nNúmero de cuenta: {customer.numero_de_cuenta}')
+            )
+            page: ft.Page = event.page
+            self.alert_confirmation.open = True
+            page.overlay.append(self.alert_confirmation)
+            page.update()
+
+    @property
+    def _data_exist(self) -> bool:
+        return True if self._maternal_surname.value and self._paternal_surname.value and self._customer_names.value and self._account_number.value else False
+    
+    def _handle_on_cancel_click_in_alert(self, event: ft.ControlEvent):
+        self.alert_confirmation.open = False
+        self.open_form()

@@ -1,8 +1,10 @@
 import os
-import pandas as pd
 import threading
-from typing import Dict, List, Generator
+import pandas as pd
+
 from unidecode import unidecode
+from typing import Dict, List, Generator
+
 
 class AccountsDataFrame:
     _instance = None
@@ -54,13 +56,9 @@ class AccountsDataFrame:
             self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
             if account_number not in self._df['Numero de Cuenta'].values:
                 raise ValueError(f"Numero de Cuenta: {account_number} no existe en la base de datos\n")
-            
             index = self._df.index[self._df['Numero de Cuenta'] == account_number].tolist()[0]
-            
-            # Verificar que los nuevos datos tengan todas las columnas necesarias
             if not all(key in new_data for key in self._df.columns):
                 raise ValueError("Datos de cuenta incompletos")
-
             self._df.loc[index] = pd.Series(new_data)
             self._save_to_csv()
     

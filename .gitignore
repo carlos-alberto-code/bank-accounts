@@ -34,4 +34,4 @@ Thumbs.db
 __pycache__/
 .vscode/
 
-test_accounts.py
+testing.py

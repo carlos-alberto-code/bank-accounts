@@ -1,8 +1,9 @@
+import threading
+import re
+
 from typing import List, Tuple
 from dataclasses import dataclass
 from data.accounts_dataframe import AccountsDataFrame
-import threading
-import re
 
 @dataclass
 class Customer:

@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import threading
 from typing import Dict, List, Generator
+from unidecode import unidecode
 
 class AccountsDataFrame:
     _instance = None
@@ -48,6 +49,21 @@ class AccountsDataFrame:
             if account_number in self._df['Numero de Cuenta'].values:
                 raise RuntimeError(f"Error al eliminar el Numero de Cuenta: {account_number}")
 
+    def edit(self, account_number: str, new_data: Dict[str, str]) -> None:
+        with self._lock:
+            self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
+            if account_number not in self._df['Numero de Cuenta'].values:
+                raise ValueError(f"Numero de Cuenta: {account_number} no existe en la base de datos\n")
+            
+            index = self._df.index[self._df['Numero de Cuenta'] == account_number].tolist()[0]
+            
+            # Verificar que los nuevos datos tengan todas las columnas necesarias
+            if not all(key in new_data for key in self._df.columns):
+                raise ValueError("Datos de cuenta incompletos")
+
+            self._df.loc[index] = pd.Series(new_data)
+            self._save_to_csv()
+    
     def _save_to_csv(self) -> None:
         with self._lock:
             self._df.to_csv(self._filepath, index=False)
@@ -57,8 +73,15 @@ class AccountsDataFrame:
             self._df.to_csv(filepath, index=False)
 
     def search(self, search_term: str) -> pd.DataFrame:
+        def normalize_text(text: str) -> str:
+            return unidecode(text).lower()
+
         with self._lock:
-            search_results = self._df[self._df.apply(lambda row: row.astype(str).str.contains(search_term, case=False, na=False).any(), axis=1)]
+            normalized_search_term = normalize_text(search_term)
+            search_results = self._df[self._df.apply(
+                lambda row: row.astype(str).apply(normalize_text).str.contains(normalized_search_term, na=False).any(),
+                axis=1
+            )]
             return search_results
     
     @property

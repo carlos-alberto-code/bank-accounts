@@ -52,7 +52,7 @@ class AccountsViewController:
         self.page.add(self.table_accounts)
 
     def _handle_on_add_button_click(self, event: ft.ControlEvent):
-        self.new_customer_form.reset()
+        self.new_customer_form.reset_values()
         self.new_customer_form.open = True
         self.page.update()
     

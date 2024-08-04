@@ -12,6 +12,10 @@ class Customer:
     nombres: str
     numero_de_cuenta: str
 
+    @property
+    def full_name(self) -> str:
+        return f"{self.nombres.capitalize()} {self.apellido_paterno.capitalize()} {self.apellido_materno.capitalize()}"
+
 class AccountsManager:
     _instance = None
     _lock = threading.Lock()

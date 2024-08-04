@@ -32,7 +32,7 @@ class FormControlsFactory:
             on_click=on_click
         )
 
-class AlertForm(ft.AlertDialog):
+class BaseForm(ft.AlertDialog):
     def __init__(self):
         super().__init__()
         self._controls_factory = FormControlsFactory()
@@ -50,12 +50,13 @@ class AlertForm(ft.AlertDialog):
         self.update()
     
 
-class ConfirmationForm(AlertForm):
+class ConfirmationForm(ft.AlertDialog):
 
-    def __init__(self, customer: Customer, on_confirm=None):
+    def __init__(self, customer: Customer, on_confirm=None, on_cancel=None):
         super().__init__()
+        self._factory = FormControlsFactory()
         self._on_confirm = on_confirm
-        self.title = self.factory.create_title_form('Confirmación', ft.icons.CONFIRMATION_NUM)
+        self.title = self._factory.create_title_form('Confirmación', ft.icons.CONFIRMATION_NUM)
         self.content = ft.ResponsiveRow(
             [
                 ft.Text('Asegurate de que los datos sean correctos!'),
@@ -64,11 +65,11 @@ class ConfirmationForm(AlertForm):
             ]
         )
         self.actions = [
-            self.factory.create_elevated_button(
+            self._factory.create_elevated_button(
                 text='Cancelar', icon=ft.icons.CANCEL,
-                on_click=lambda e: self.close_form()
+                on_click=on_cancel
             ),
-            self.factory.create_elevated_button(
+            self._factory.create_elevated_button(
                 text='Confirmar', icon=ft.icons.SAVE,
                 on_click=self.on_confirm
             )
@@ -82,7 +83,15 @@ class ConfirmationForm(AlertForm):
     def on_confirm(self, event_function: ft.ControlEvent):
         self._on_confirm = event_function
     
-class NewCustomerForm(AlertForm):
+    def open_form(self):
+        self.open = True
+        self.update()
+    
+    def close_form(self):
+        self.open = False
+        self.update()
+    
+class NewCustomerForm(BaseForm):
 
     def __init__(self):
         super().__init__()
@@ -136,29 +145,31 @@ class NewCustomerForm(AlertForm):
         self.update()
     
     def _handle_on_save_click(self, event: ft.ControlEvent):
-        customer = Customer(
-            apellido_paterno=str(self._psurname.value),
-            apellido_materno=str(self._msurname.value),
-            nombres=str(self._names.value),
-            numero_de_cuenta=str(self._account.value)
-        )
         if not self._data_exist:
             print('Los datos no existen: marcar los controles que no tengan datos en rojo')
         if self._data_exist:
-            self.alert_confirmation = ConfirmationForm(customer, self._handle_on_confirm_clik)
+            customer = Customer(
+                apellido_paterno=str(self._psurname.value),
+                apellido_materno=str(self._msurname.value),
+                nombres=str(self._names.value),
+                numero_de_cuenta=str(self._account.value)
+            )
+            self.alert_confirmation = ConfirmationForm(customer, self._handle_on_confirm_clik, on_cancel=self._handle_on_cancel_click_in_alert)
             page: ft.Page = event.page
-            self.alert_confirmation.open = True
             page.overlay.append(self.alert_confirmation)
-            page.update()
+            event.page.update()
+            self.alert_confirmation.open_form()
     
     def _handle_on_confirm_clik(self, event: ft.ControlEvent):
         print('Datos confirmados!')
         self.alert_confirmation.close_form()
 
+    def _handle_on_cancel_click_in_alert(self, event: ft.ControlEvent):
+        # self.alert_confirmation.close_form()
+        self.open_form()
+        event.page.update()
+
     @property
     def _data_exist(self) -> bool:
         return True if self._msurname.value and self._psurname.value and self._names.value and self._account.value else False
     
-    def _handle_on_cancel_click_in_alert(self, event: ft.ControlEvent):
-        self.alert_confirmation.close_form()
-        self.open_form()

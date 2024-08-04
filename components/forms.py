@@ -225,4 +225,74 @@ class NewCustomerForm(BaseForm):
     @property
     def _data_exist(self) -> bool:
         return True if self._msurname.value and self._psurname.value and self._names.value and self._account.value else False
+
+class EditCustomerForm(BaseForm):
+
+    def __init__(self):
+        super().__init__()
+        self._account = self.factory.create_text_field(
+            label='Número de cuenta',
+            input_filter=ft.NumbersOnlyInputFilter(),
+            on_change=self._handle_on_change
+        )
+        self.title = self.factory.create_title_form('Editar cliente', ft.icons.EDIT)
+        self._search_button = self.factory.create_elevated_button(
+            text='Buscar', icon=ft.icons.SAVE_ALT,
+            disabled=True,
+            on_click=self._handle_on_save_click,
+        )
+        self.content = ft.ResponsiveRow(
+            [
+                self._account
+            ],
+        )
+        self.actions = [
+            self.factory.create_elevated_button(
+                text='Cancelar', icon=ft.icons.CANCEL,
+                on_click=self._handle_on_cancel_click
+            ),
+            self.factory.create_elevated_button(
+                text='Limpiar', icon=ft.icons.CLEAR_ROUNDED,
+                on_click=self._handle_on_clean_click
+            ),
+            self._search_button
+        ]
+    
+    def _exist_data_in_txt_fld(self) -> bool:
+        return True if self._account.value else False
+    
+    def _handle_on_change(self, event: ft.ControlEvent):
+        if self._exist_data_in_txt_fld:
+            self._search_button.disabled = False
+            self._search_button.update()
+        else:
+            self._search_button.disabled = True
+            self._search_button.update()
+    
+    def _handle_on_cancel_click(self, event: ft.ControlEvent):
+        self._account.value = ''
+        self._search_button.disabled = True
+        self._search_button.update()
+        self.open = False
+        event.page.update()
+    
+    def _handle_on_clean_click(self, event: ft.ControlEvent):
+        self._account.value = ''
+        self._search_button.disabled = True
+        self._search_button.update()
+        self._account.focus()
+        self.update()
+    
+    def _account_exist(self, account: str) -> bool:
+        return True if accounts.exists(account) else False
+
+    def _handle_on_save_click(self, event: ft.ControlEvent):
+        page: ft.Page = event.page
+        number = str(self._account.value)
+        if self._account_exist(number):
+            # Actualizar la tabla para mostrar los datos del cliente con esa cuenta y habilitar los campos de la tabla para editar
+            pass
+        else:
+            self._account.error_text = 'El número de cuenta no existe!'
+        
     

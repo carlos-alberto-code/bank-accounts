@@ -14,7 +14,7 @@ class Customer:
 
     @property
     def full_name(self) -> str:
-        return f"{self.nombres.capitalize()} {self.apellido_paterno.capitalize()} {self.apellido_materno.capitalize()}"
+        return f"{self.nombres.title()} {self.apellido_paterno.capitalize()} {self.apellido_materno.capitalize()}"
 
 class AccountsManager:
     _instance = None
@@ -55,6 +55,9 @@ class AccountsManager:
             return Customer(row['Apellido Paterno'], row['Apellido Materno'], row['Nombres'], row['Numero de Cuenta'])
         except ValueError as e:
             raise ValueError(f"Error al obtener la cuenta: {str(e)}")
+    
+    def exists(self, account_number: str) -> bool:
+        return self._accounts.exists(account_number)
 
     def get_all(self) -> List[Customer]:
         return [

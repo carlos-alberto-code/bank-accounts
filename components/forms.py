@@ -10,10 +10,6 @@ class SnackbarMessage(ft.SnackBar):
         super().__init__(
             content=ft.Row([ft.Text(message)], alignment=ft.MainAxisAlignment.CENTER),
         )
-    
-    def show(self):
-        self.open = True
-        self.update()
 
 class FormControlsFactory:
 
@@ -54,15 +50,6 @@ class BaseForm(ft.AlertDialog):
     def factory(self):
         return self._controls_factory
     
-    def open_form(self):
-        self.open = True
-        self.update()
-    
-    def close_form(self):
-        self.open = False
-        self.update()
-    
-
 class ConfirmationForm(BaseForm):
 
     def __init__(self, title: str, content: list[ft.Control], on_confirm=None, on_cancel=None):
@@ -156,11 +143,10 @@ class NewCustomerForm(BaseForm):
         self._names.value = ''
         self._account.value = ''
     
-    def reset_controls(self):
+    def _reset_controls(self):
         self._save_button.disabled = True
         self._save_button.update()
         
-    
     def _handle_on_change(self, event: ft.ControlEvent):
         if self._data_exist:
             self._save_button.disabled = False
@@ -171,49 +157,56 @@ class NewCustomerForm(BaseForm):
     
     def _handle_on_cancel_click(self, event: ft.ControlEvent):
         self.reset_values()
-        self.reset_controls()
-        self.close_form()
+        self._reset_controls()
+        self.open = False
+        event.page.update()
     
     def _handle_on_clean_click(self, event: ft.ControlEvent):
         self.reset_values()
-        self.reset_controls()
+        self._reset_controls()
         self._names.focus()
         self.update()
     
     def _handle_on_save_click(self, event: ft.ControlEvent):
         page: ft.Page = event.page
-        if self._data_exist:
-            self.customer = Customer(
-                apellido_paterno=str(self._psurname.value),
-                apellido_materno=str(self._msurname.value),
-                nombres=str(self._names.value),
-                numero_de_cuenta=str(self._account.value)
-            )
-            self.alert_confirmation = ConfirmationForm(
-                title='Confirma los datos',
-                content=[
-                    ft.Row(
-                        [
-                            ft.Text('Persona:'),
-                            ft.Text(self.customer.full_name, weight=ft.FontWeight.BOLD),
-                        ],
-                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                    ),
-                    ft.Row(
-                        [
-                            ft.Text('Número de cuenta:'),
-                            ft.Text(self.customer.numero_de_cuenta, weight=ft.FontWeight.BOLD),
-                        ],
-                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                    )
-                ],
-                on_cancel=self._handle_on_cancel_confirmation_alert,
-                on_confirm=self._handle_on_confirm_confirmation_alert
-            )
-            
-            page.overlay.append(self.alert_confirmation)
-            event.page.update()
-            self.alert_confirmation.open_form()
+        number = str(self._account.value)
+        if self._account_exist(number):
+            snackbar = SnackbarMessage('El número de cuenta ya existe!')
+            page.overlay.append(snackbar)
+            snackbar.open = True
+            page.update()
+        else:
+            self._open_confirmation_alert(event)
+    
+    def _account_exist(self, account: str) -> bool:
+        return True if accounts.exists(account) else False
+    
+    def _open_confirmation_alert(self, event: ft.ControlEvent):
+        page: ft.Page = event.page
+        self.customer = Customer(
+            apellido_paterno=str(self._psurname.value),
+            apellido_materno=str(self._msurname.value),
+            nombres=str(self._names.value),
+            numero_de_cuenta=str(self._account.value)
+        )
+        self.alert_confirmation = ConfirmationForm(
+            title='Confirma los datos',
+            content=[
+                ft.Text(self.customer.full_name),
+                ft.Row(
+                    [
+                        ft.Text('Cuenta:'),
+                        ft.Text(self.customer.numero_de_cuenta),
+                    ],
+                    alignment=ft.MainAxisAlignment.START
+                )
+            ],
+            on_cancel=self._handle_on_cancel_confirmation_alert,
+            on_confirm=self._handle_on_confirm_confirmation_alert
+        )
+        page.overlay.append(self.alert_confirmation)
+        self.alert_confirmation.open = True
+        page.update()
     
     def _handle_on_confirm_confirmation_alert(self, event: ft.ControlEvent):
         accounts.add(self.customer)
@@ -226,8 +219,7 @@ class NewCustomerForm(BaseForm):
         self.alert_confirmation.update()
 
     def _handle_on_cancel_confirmation_alert(self, event: ft.ControlEvent):
-        # self.alert_confirmation.close_form()
-        self.open_form()
+        self.open = True
         event.page.update()
 
     @property

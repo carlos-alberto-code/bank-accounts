@@ -38,6 +38,10 @@ class AccountsDataFrame:
         if account_number not in self._df['Numero de Cuenta'].values:
             raise ValueError(f"Numero de Cuenta: {account_number} no existe en la base de datos\n")
         return self._df[self._df['Numero de Cuenta'] == account_number].iloc[0]
+    
+    def exists(self, account_number: str) -> bool:
+        self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
+        return account_number in self._df['Numero de Cuenta'].values
 
     def remove(self, account_number: str) -> None:
         self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)

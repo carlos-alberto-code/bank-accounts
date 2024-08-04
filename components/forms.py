@@ -3,30 +3,19 @@ from data.accounts_manager import AccountsManager, Customer
 
 accounts = AccountsManager()
 
-class AlertConfirmation(ft.AlertDialog):
-    def __init__(self, title: str, content: ft.Control, actions: list[ft.Control]):
-        super().__init__(
-            title=ft.Row(
-                [ft.Icon(ft.icons.CONFIRMATION_NUM), ft.Text(f'{title}')],
-                alignment=ft.MainAxisAlignment.CENTER,
-            ),
-            content=content,
-            actions=actions,
-        )
-
-class Form(ft.AlertDialog):
+class AlertForm(ft.AlertDialog):
     def __init__(self):
         super().__init__()
     
-    def open_form(self) -> None:
+    def open_form(self):
         self.open = True
         self.update()
     
-    def close_form(self) -> None:
+    def close_form(self):
         self.open = False
         self.update()
     
-    def _create_elevated_button(self, text: str, icon: str, on_click=None) -> ft.ElevatedButton:
+    def create_elevated_button(self, text: str, icon: str, on_click=None) -> ft.ElevatedButton:
         return ft.ElevatedButton(
             text=text, icon=icon,
             style=ft.ButtonStyle(
@@ -34,8 +23,22 @@ class Form(ft.AlertDialog):
             ),
             on_click=on_click
         )
+
+class FormConfirmation(AlertForm):
+    def __init__(self, title: str, content: ft.Control, actions: list[ft.Control]):
+        super().__init__()
+        self.title = ft.Row(
+            [ft.Icon(ft.icons.CONFIRMATION_NUM), ft.Text(f'{title}')],
+            alignment=ft.MainAxisAlignment.CENTER,
+        )
+        self.content = content
+        self.actions = actions
+
+class Form(AlertForm):
+    def __init__(self):
+        super().__init__()
     
-    def _create_text_field(self, label: str, input_filter: ft.InputFilter, autofocus: bool = False, visible: bool = True) -> ft.TextField:
+    def create_text_field(self, label: str, input_filter: ft.InputFilter, autofocus: bool = False, visible: bool = True) -> ft.TextField:
         return ft.TextField(
             label=label,
             height=40,
@@ -51,20 +54,20 @@ class NewCustomerForm(Form):
 
     def __init__(self):
         super().__init__()
-        self._paternal_surname = self._create_text_field(
+        self._paternal_surname = self.create_text_field(
             label='Apellido Paterno',
             input_filter=ft.TextOnlyInputFilter(),
             autofocus=True
         )
-        self._maternal_surname = self._create_text_field(
+        self._maternal_surname = self.create_text_field(
             label='Apellido Materno',
             input_filter=ft.TextOnlyInputFilter()
         )
-        self._customer_names = self._create_text_field(
+        self._customer_names = self.create_text_field(
             label='Nombres',
             input_filter=ft.InputFilter(regex_string=r'^[A-Za-z\s]+$')
         )
-        self._account_number = self._create_text_field(
+        self._account_number = self.create_text_field(
             label='Número de cuenta',
             input_filter=ft.NumbersOnlyInputFilter()
         )
@@ -85,9 +88,9 @@ class NewCustomerForm(Form):
             ],
         )
         self.actions = [
-            self._create_elevated_button('Cancelar', ft.icons.CANCEL, self._handle_on_cancel_click),
-            self._create_elevated_button('Limpiar', ft.icons.CLEAR_ALL_ROUNDED, self._handle_on_clean_click),
-            self._create_elevated_button('Guardar', ft.icons.SAVE_ALT, self._handle_on_save_click)
+            self.create_elevated_button('Cancelar', ft.icons.CANCEL, self._handle_on_cancel_click),
+            self.create_elevated_button('Limpiar', ft.icons.CLEAR_ALL_ROUNDED, self._handle_on_clean_click),
+            self.create_elevated_button('Guardar', ft.icons.SAVE_ALT, self._handle_on_save_click)
         ]
     
     def reset(self):
@@ -114,11 +117,11 @@ class NewCustomerForm(Form):
             numero_de_cuenta=str(self._account_number.value)
         )
         if self._data_exist:
-            self.alert_confirmation = AlertConfirmation(
+            self.alert_confirmation = FormConfirmation(
                 title='Confirmación',
                 actions=[
-                    self._create_elevated_button('Cancelar', ft.icons.CANCEL, self._handle_on_cancel_click_in_alert),
-                    self._create_elevated_button('Confirmar', ft.icons.SAVE),
+                    self.create_elevated_button('Cancelar', ft.icons.CANCEL, self._handle_on_cancel_click_in_alert),
+                    self.create_elevated_button('Confirmar', ft.icons.SAVE),
                 ],
                 content=ft.Text(f'Asegurate de que los datos sean correctos:\nNombre completo: {customer.apellido_paterno.capitalize()} {customer.apellido_materno.capitalize()} {customer.nombres.capitalize()}\nNúmero de cuenta: {customer.numero_de_cuenta}')
             )

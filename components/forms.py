@@ -165,6 +165,9 @@ class NewCustomerForm(BaseForm):
         if self._data_exist:
             self._save_button.disabled = False
             self._save_button.update()
+        else:
+            self._save_button.disabled = True
+            self._save_button.update()
     
     def _handle_on_cancel_click(self, event: ft.ControlEvent):
         self.reset_values()
@@ -179,10 +182,6 @@ class NewCustomerForm(BaseForm):
     
     def _handle_on_save_click(self, event: ft.ControlEvent):
         page: ft.Page = event.page
-        if not self._data_exist:
-            snackbar = SnackbarMessage('Todos los campos son requeridos!')
-            page.overlay.append(snackbar)
-            snackbar.show()
         if self._data_exist:
             self.customer = Customer(
                 apellido_paterno=str(self._psurname.value),

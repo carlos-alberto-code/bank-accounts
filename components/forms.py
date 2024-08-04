@@ -50,13 +50,12 @@ class BaseForm(ft.AlertDialog):
         self.update()
     
 
-class ConfirmationForm(ft.AlertDialog):
+class ConfirmationForm(BaseForm):
 
     def __init__(self, customer: Customer, on_confirm=None, on_cancel=None):
         super().__init__()
-        self._factory = FormControlsFactory()
         self._on_confirm = on_confirm
-        self.title = self._factory.create_title_form('Confirmación', ft.icons.CONFIRMATION_NUM)
+        self.title = self.factory.create_title_form('Confirmación', ft.icons.CONFIRMATION_NUM)
         self.content = ft.ResponsiveRow(
             [
                 ft.Text('Asegurate de que los datos sean correctos!'),
@@ -65,11 +64,11 @@ class ConfirmationForm(ft.AlertDialog):
             ]
         )
         self.actions = [
-            self._factory.create_elevated_button(
+            self.factory.create_elevated_button(
                 text='Cancelar', icon=ft.icons.CANCEL,
                 on_click=on_cancel
             ),
-            self._factory.create_elevated_button(
+            self.factory.create_elevated_button(
                 text='Confirmar', icon=ft.icons.SAVE,
                 on_click=self.on_confirm
             )
@@ -82,14 +81,6 @@ class ConfirmationForm(ft.AlertDialog):
     @on_confirm.setter
     def on_confirm(self, event_function: ft.ControlEvent):
         self._on_confirm = event_function
-    
-    def open_form(self):
-        self.open = True
-        self.update()
-    
-    def close_form(self):
-        self.open = False
-        self.update()
     
 class NewCustomerForm(BaseForm):
 

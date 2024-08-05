@@ -47,7 +47,7 @@ class AccountsTable(ft.DataTable):
     def _create_columns(self) -> list[ft.DataColumn]:
         return [
             ft.DataColumn(
-                label=ft.Text(column_name, weight=ft.FontWeight.BOLD),
+                label=ft.Text(column_name),
                 tooltip=f'Ordenar por {column_name.lower()}',
                 on_sort=self.handle_on_sort
             )

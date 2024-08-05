@@ -57,8 +57,7 @@ class AccountsViewController:
         self.page.update()
     
     def _handle_on_edit_button_click(self, event: ft.ControlEvent):
-        # self.edit_customer_form.reset()
-        # self.edit_customer_form.open = True
+        self.table_accounts.active_editing()
         self.page.update()
 
     def _handle_on_delete_button_click(self, event: ft.ControlEvent):

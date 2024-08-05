@@ -1,5 +1,6 @@
 import flet as ft
 from data.accounts_manager import Customer
+from components.forms import ConfirmationForm
 
 def _create_snackbar(message: str) -> ft.SnackBar:
     return ft.SnackBar(
@@ -44,6 +45,22 @@ class AccountsTable(ft.DataTable):
         self._customers = customers
         self.rows = self._create_rows()
     
+    def active_editing(self) -> None:
+        if self.rows:
+            for row in self.rows:
+                for cell in row.cells[:-1]:
+                    cell.show_edit_icon = True
+                    cell.on_tap = self.handle_on_edit_tap
+            self.update()
+    
+    def disable_editing(self) -> None:
+        if self.rows:
+            for row in self.rows:
+                for cell in row.cells[:-1]:
+                    cell.show_edit_icon = False
+                    cell.on_tap = None
+            self.update()
+    
     def _create_columns(self) -> list[ft.DataColumn]:
         return [
             ft.DataColumn(
@@ -58,9 +75,9 @@ class AccountsTable(ft.DataTable):
         return [
             ft.DataRow(
                 cells=[
-                    ft.DataCell(ft.Text(customer.apellido_paterno, size=13)),
-                    ft.DataCell(ft.Text(customer.apellido_materno, size=13)),
-                    ft.DataCell(ft.Text(customer.nombres, size=13)),
+                    ft.DataCell(ft.Text(customer.apellido_paterno, size=13), data={'column': 'apellido paterno', 'value': customer.apellido_paterno, 'row': customer}),
+                    ft.DataCell(ft.Text(customer.apellido_materno, size=13), data={'column': 'apellido materno', 'value': customer.apellido_materno, 'row': customer}),
+                    ft.DataCell(ft.Text(customer.nombres, size=13), data={'column': 'nombres', 'value': customer.nombres, 'row': customer}),
                     ft.DataCell(
                         ft.Row(
                             [ft.Text(customer.numero_de_cuenta, size=13), ft.Icon(ft.icons.COPY, size=13)],
@@ -85,4 +102,45 @@ class AccountsTable(ft.DataTable):
             self._customers.sort(key=sort, reverse=self._sort_columns_states[col_name])
             self.rows = self._create_rows()
             self.update()
+    
+    def _create_text_field(self, value: str, on_submit=None) -> ft.TextField:
+        return ft.TextField(
+            value=value,
+            text_style=ft.TextStyle(size=13),
+            color='green',
+            border_radius=5,
+            border=ft.InputBorder.NONE,
+            text_align=ft.TextAlign.CENTER,
+            on_submit=on_submit,
+            autofocus=True,
+        )
+    
+    def _show_alert_message(self, event: ft.ControlEvent) -> None:
+        page: ft.Page = event.page
+        confirmation = ConfirmationForm(
+            title='Confirmación',
+            content=[ft.Text('¿Estás seguro de que deseas guardar los cambios?')],
+            on_confirm=lambda event: print('Confirmado'),
+            on_cancel=lambda event: print('Cancelado'),
+        )
+        page.overlay.append(confirmation)
+        confirmation.open = True
+        page.update()
+
+    def _handle_on_submit(self, event: ft.ControlEvent) -> None:
+        # txt_field: ft.TextField = event.control
+        # new_text_value: str = str(txt_field.value)
+        # txt_field.read_only = True
+        # txt_field.text_align = ft.TextAlign.START
+        # txt_field.color = 'black'
+        # txt_field.update()
+        self._show_alert_message(event)
+        
+    
+    def handle_on_edit_tap(self, event: ft.ControlEvent) -> None:
+        cell: ft.DataCell = event.control
+        current_text_value: str = cell.content.value # type: ignore
+        cell.content = self._create_text_field(current_text_value, on_submit=self._handle_on_submit)
+        self.disable_editing()
+        cell.update()
     

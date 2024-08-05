@@ -2,19 +2,60 @@ import threading
 import re
 
 from typing import List, Tuple
-from dataclasses import dataclass
 from data.accounts_dataframe import AccountsDataFrame
 
-@dataclass
 class Customer:
-    apellido_paterno: str
-    apellido_materno: str
-    nombres: str
-    numero_de_cuenta: str
+
+    def __init__(self, apellido_paterno: str, apellido_materno: str, nombres: str, numero_de_cuenta: str) -> None:
+        self._apellido_paterno: str = apellido_paterno
+        self._apellido_materno: str = apellido_materno
+        self._nombres: str = nombres
+        self._numero_de_cuenta: str = numero_de_cuenta
+        self._data = {
+            'Apellido Paterno': self.apellido_paterno,
+            'Apellido Materno': self.apellido_materno,
+            'Nombres': self.nombres,
+            'Numero de cuenta': self.numero_de_cuenta,
+        }
+    
+    @property
+    def apellido_paterno(self) -> str:
+        return self._apellido_paterno
+    
+    @apellido_paterno.setter
+    def apellido_paterno(self, value: str) -> None:
+        self._apellido_paterno = value
+    
+    @property
+    def apellido_materno(self) -> str:
+        return self._apellido_materno
+    
+    @apellido_materno.setter
+    def apellido_materno(self, value: str) -> None:
+        self._apellido_materno = value
+    
+    @property
+    def nombres(self) -> str:
+        return self._nombres
+    
+    @nombres.setter
+    def nombres(self, value: str) -> None:
+        self._nombres = value
+    
+    @property
+    def numero_de_cuenta(self) -> str:
+        return self._numero_de_cuenta
+    
+    @numero_de_cuenta.setter
+    def numero_de_cuenta(self, value: str) -> None:
+        self._numero_de_cuenta = value
 
     @property
     def full_name(self) -> str:
         return f"{self.nombres.title()} {self.apellido_paterno.capitalize()} {self.apellido_materno.capitalize()}"
+    
+    def __repr__(self) -> str:
+        return f'Customer(fullname{self.full_name})'
 
 class AccountsManager:
     _instance = None

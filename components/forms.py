@@ -62,11 +62,11 @@ class ConfirmationForm(BaseForm):
         self.actions = [
             self.factory.create_elevated_button(
                 text='Cancelar', icon=ft.icons.CANCEL,
-                on_click=on_cancel
+                on_click=self._on_cancel
             ),
             self.factory.create_elevated_button(
                 text='Confirmar', icon=ft.icons.SAVE,
-                on_click=self.on_confirm
+                on_click=self._on_confirm
             )
         ]
 

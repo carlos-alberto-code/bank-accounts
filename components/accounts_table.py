@@ -1,3 +1,4 @@
+from typing import Optional
 import flet as ft
 from data.accounts_manager import Customer
 from components.forms import ConfirmationForm
@@ -22,6 +23,24 @@ class AccountsTable(ft.DataTable):
             columns=self._create_columns(),
             rows=self._create_rows(),
         )
+        self._customer_selected: Optional[Customer] = None
+        self._column_selected: Optional[str] = None
+    
+    @property
+    def customer_selected(self) -> Customer | None:
+        return self._customer_selected
+
+    @customer_selected.setter
+    def customer_selected(self, customer: Customer) -> None:
+        self._customer_selected = customer
+    
+    @property
+    def column_selected(self) -> str | None:
+        return self._column_selected
+    
+    @column_selected.setter
+    def column_selected(self, column_name: str) -> None:
+        self._column_selected = column_name
 
     @property
     def customers(self) -> list[Customer]:
@@ -43,7 +62,7 @@ class AccountsTable(ft.DataTable):
             for row in self.rows:
                 for cell in row.cells[:-1]:
                     cell.show_edit_icon = enable
-                    cell.on_tap = self.handle_on_edit_tap if enable else None
+                    cell.on_tap = self._handle_on_cell_click if enable else None
             self.update()
     
     def _create_columns(self) -> list[ft.DataColumn]:
@@ -51,7 +70,7 @@ class AccountsTable(ft.DataTable):
             ft.DataColumn(
                 label=ft.Text(column_name),
                 tooltip=f'Ordenar por {column_name.lower()}',
-                on_sort=self.handle_on_sort
+                on_sort=self._handle_on_sort
             )
             for column_name in self._column_names
         ]
@@ -79,10 +98,10 @@ class AccountsTable(ft.DataTable):
             ft.Row(
                 [ft.Text(value, size=13), ft.Icon(ft.icons.COPY, size=13)],
             ),
-            on_tap=self._handle_on_click_cell,
+            on_tap=self._handle_on_copy,
         )
     
-    def handle_on_sort(self, event: ft.ControlEvent) -> None:
+    def _handle_on_sort(self, event: ft.ControlEvent) -> None:
         sorts = {
             'apellido paterno': lambda customer: customer.apellido_paterno,
             'apellido materno': lambda customer: customer.apellido_materno,
@@ -97,25 +116,32 @@ class AccountsTable(ft.DataTable):
             self.rows = self._create_rows()
             self.update()
     
-    def _create_text_field(self, value: str, on_submit=None) -> ft.TextField:
+    def _create_text_field(self, value: str, on_submit=None, on_blur=None) -> ft.TextField:
         return ft.TextField(
             value=value,
             text_style=ft.TextStyle(size=13),
-            color='green',
+            color='blue',
             border_radius=5,
             border=ft.InputBorder.NONE,
             text_align=ft.TextAlign.CENTER,
             on_submit=on_submit,
             autofocus=True,
+            on_blur=on_blur,
         )
+    
+    def _handle_on_cancel_alert(self, event: ft.ControlEvent) -> None:
+        self.disable_editing()
+
+    def _handle_on_confirm_alert(self, event: ft.ControlEvent):
+        pass
     
     def _show_alert_message(self, event: ft.ControlEvent) -> None:
         page: ft.Page = event.page
         confirmation = ConfirmationForm(
             title='Confirmación',
             content=[ft.Text('¿Estás seguro de que deseas guardar los cambios?')],
-            on_confirm=lambda event: print('Confirmado'),
-            on_cancel=lambda event: print('Cancelado'),
+            on_confirm=self._handle_on_confirm_alert,
+            on_cancel=self._handle_on_cancel_alert,
         )
         page.overlay.append(confirmation)
         confirmation.open = True
@@ -124,14 +150,14 @@ class AccountsTable(ft.DataTable):
     def _handle_on_submit(self, event: ft.ControlEvent) -> None:
         self._show_alert_message(event)
         
-    def handle_on_edit_tap(self, event: ft.ControlEvent) -> None:
-        cell: ft.DataCell = event.control
-        current_text_value: str = cell.content.value  # type: ignore
-        cell.content = self._create_text_field(current_text_value, on_submit=self._handle_on_submit)
+    def _handle_on_cell_click(self, event: ft.ControlEvent) -> None:
+        self._current_cell: ft.DataCell = event.control
+        current_text_value: str = event.control.content.value
+        self._current_cell.content = self._create_text_field(current_text_value, on_submit=self._handle_on_submit, on_blur=self._handle_on_submit)
         self.disable_editing()
-        cell.update()
+        self._current_cell.update()
 
-    def _handle_on_click_cell(self, event: ft.ControlEvent) -> None:
+    def _handle_on_copy(self, event: ft.ControlEvent) -> None:
         page: ft.Page = event.page
         page.set_clipboard(str(event.control.content.controls[0].value))
         self._show_message(event)

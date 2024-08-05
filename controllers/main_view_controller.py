@@ -1,9 +1,9 @@
 import flet as ft
 
 from components.accounts_table    import AccountsTable
+from components.forms             import NewCustomerForm
 from data.accounts_manager        import AccountsManager
 from components.appbar_actions    import add_button, delete_button, edit_button, searcher
-from components.forms             import NewCustomerForm #EditCustomerForm, DeleteCustomerForm
 
 class AccountsViewController:
 

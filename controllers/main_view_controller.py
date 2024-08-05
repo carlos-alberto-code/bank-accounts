@@ -11,8 +11,6 @@ class AccountsViewController:
         self.page = page
         self.accounts = AccountsManager()
         self.new_customer_form = NewCustomerForm()
-        # self.edit_customer_form = EditCustomerForm()
-        # self.delete_customer_form = DeleteCustomerForm()
         self.table_accounts = AccountsTable(
             column_names=self.accounts.columns,
             customers=self.accounts.get_all()
@@ -47,8 +45,6 @@ class AccountsViewController:
         searcher.on_change      = self._handle_on_searcher_change
         self._setup_appbar()
         self.page.overlay.append(self.new_customer_form)
-        # self.page.overlay.append(self.edit_customer_form)
-        # self.page.overlay.append(self.delete_customer_form)
         self.page.add(self.table_accounts)
 
     def _handle_on_add_button_click(self, event: ft.ControlEvent):
@@ -61,8 +57,6 @@ class AccountsViewController:
         self.page.update()
 
     def _handle_on_delete_button_click(self, event: ft.ControlEvent):
-        # self.delete_customer_form.reset()
-        # self.delete_customer_form.open = True
         self.page.update()
     
     def _handle_on_searcher_change(self, event: ft.ControlEvent):

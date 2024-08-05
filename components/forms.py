@@ -15,7 +15,8 @@ class FormControlsFactory:
 
     def create_title_form(self, text: str, icon: Optional[str]):
         return ft.Row(
-            [ft.Icon(icon), ft.Text(text)]
+            [ft.Icon(icon), ft.Text(text)],
+            alignment=ft.MainAxisAlignment.START,
         )
     
     def create_text_field(self, label: str, input_filter: ft.InputFilter, autofocus: bool = False, visible: bool = True, on_change=None) -> ft.TextField:

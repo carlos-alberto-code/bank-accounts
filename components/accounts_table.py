@@ -7,19 +7,6 @@ def _create_snackbar(message: str) -> ft.SnackBar:
         content=ft.Row([ft.Text(message)], alignment=ft.MainAxisAlignment.CENTER),
     )
 
-def _show_message(event: ft.ControlEvent) -> None:
-    snackbar = _create_snackbar(f'Número de cuenta copiado!')
-    snackbar.open = True
-    page: ft.Page = event.page
-    page.overlay.append(snackbar)
-    page.update()
-
-def _handle_on_click_cell(event: ft.ControlEvent) -> None:
-    page: ft.Page = event.page
-    page.set_clipboard(str(event.control.content.controls[0].value))
-    _show_message(event)
-
-
 class AccountsTable(ft.DataTable):
 
     def __init__(self, column_names: list[str], customers: list[Customer]) -> None:
@@ -35,30 +22,28 @@ class AccountsTable(ft.DataTable):
             columns=self._create_columns(),
             rows=self._create_rows(),
         )
-    
+
     @property
     def customers(self) -> list[Customer]:
         return self._customers
-    
+
     @customers.setter
     def customers(self, customers: list[Customer]) -> None:
         self._customers = customers
         self.rows = self._create_rows()
     
     def active_editing(self) -> None:
-        if self.rows:
-            for row in self.rows:
-                for cell in row.cells[:-1]:
-                    cell.show_edit_icon = True
-                    cell.on_tap = self.handle_on_edit_tap
-            self.update()
+        self._set_editing(True)
     
     def disable_editing(self) -> None:
+        self._set_editing(False)
+
+    def _set_editing(self, enable: bool) -> None:
         if self.rows:
             for row in self.rows:
                 for cell in row.cells[:-1]:
-                    cell.show_edit_icon = False
-                    cell.on_tap = None
+                    cell.show_edit_icon = enable
+                    cell.on_tap = self.handle_on_edit_tap if enable else None
             self.update()
     
     def _create_columns(self) -> list[ft.DataColumn]:
@@ -75,18 +60,27 @@ class AccountsTable(ft.DataTable):
         return [
             ft.DataRow(
                 cells=[
-                    ft.DataCell(ft.Text(customer.apellido_paterno, size=13), data={'column': 'apellido paterno', 'value': customer.apellido_paterno, 'row': customer}),
-                    ft.DataCell(ft.Text(customer.apellido_materno, size=13), data={'column': 'apellido materno', 'value': customer.apellido_materno, 'row': customer}),
-                    ft.DataCell(ft.Text(customer.nombres, size=13), data={'column': 'nombres', 'value': customer.nombres, 'row': customer}),
-                    ft.DataCell(
-                        ft.Row(
-                            [ft.Text(customer.numero_de_cuenta, size=13), ft.Icon(ft.icons.COPY, size=13)],
-                        ),
-                        on_tap=_handle_on_click_cell,
-                    ),
+                    self._create_data_cell(customer.apellido_paterno, 'apellido paterno', customer),
+                    self._create_data_cell(customer.apellido_materno, 'apellido materno', customer),
+                    self._create_data_cell(customer.nombres, 'nombres', customer),
+                    self._create_copy_cell(customer.numero_de_cuenta)
                 ]
             ) for customer in self.customers
         ]
+    
+    def _create_data_cell(self, value: str, column_name: str, customer: Customer) -> ft.DataCell:
+        return ft.DataCell(
+            ft.Text(value, size=13),
+            data={'column': column_name, 'value': value, 'row': customer}
+        )
+
+    def _create_copy_cell(self, value: str) -> ft.DataCell:
+        return ft.DataCell(
+            ft.Row(
+                [ft.Text(value, size=13), ft.Icon(ft.icons.COPY, size=13)],
+            ),
+            on_tap=self._handle_on_click_cell,
+        )
     
     def handle_on_sort(self, event: ft.ControlEvent) -> None:
         sorts = {
@@ -96,7 +90,7 @@ class AccountsTable(ft.DataTable):
             'numero de cuenta': lambda customer: customer.numero_de_cuenta,
         }
         col_name: str = event.control.label.value.lower()
-        if col_name.lower() in sorts:
+        if col_name in sorts:
             sort = sorts[col_name]
             self._sort_columns_states[col_name] = not self._sort_columns_states[col_name]
             self._customers.sort(key=sort, reverse=self._sort_columns_states[col_name])
@@ -128,19 +122,23 @@ class AccountsTable(ft.DataTable):
         page.update()
 
     def _handle_on_submit(self, event: ft.ControlEvent) -> None:
-        # txt_field: ft.TextField = event.control
-        # new_text_value: str = str(txt_field.value)
-        # txt_field.read_only = True
-        # txt_field.text_align = ft.TextAlign.START
-        # txt_field.color = 'black'
-        # txt_field.update()
         self._show_alert_message(event)
         
-    
     def handle_on_edit_tap(self, event: ft.ControlEvent) -> None:
         cell: ft.DataCell = event.control
-        current_text_value: str = cell.content.value # type: ignore
+        current_text_value: str = cell.content.value  # type: ignore
         cell.content = self._create_text_field(current_text_value, on_submit=self._handle_on_submit)
         self.disable_editing()
         cell.update()
+
+    def _handle_on_click_cell(self, event: ft.ControlEvent) -> None:
+        page: ft.Page = event.page
+        page.set_clipboard(str(event.control.content.controls[0].value))
+        self._show_message(event)
     
+    def _show_message(self, event: ft.ControlEvent) -> None:
+        snackbar = _create_snackbar('Número de cuenta copiado!')
+        snackbar.open = True
+        page: ft.Page = event.page
+        page.overlay.append(snackbar)
+        page.update()

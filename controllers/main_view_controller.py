@@ -57,6 +57,7 @@ class AccountsViewController:
         self.page.update()
 
     def _handle_on_delete_button_click(self, event: ft.ControlEvent):
+        self.table_accounts.active_deleting()
         self.page.update()
     
     def _handle_on_searcher_change(self, event: ft.ControlEvent):

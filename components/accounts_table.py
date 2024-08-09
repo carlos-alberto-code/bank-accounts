@@ -65,6 +65,21 @@ class AccountsTable(ft.DataTable):
                     cell.on_tap = self._handle_on_cell_click if enable else None
             self.update()
     
+    def active_deleting(self) -> None:
+        self._set_deleting(True)
+    
+    def disable_deleting(self) -> None:
+        self._set_deleting(False)
+    
+    def _set_deleting(self, enable: bool) -> None:
+        if self.rows:
+            for row in self.rows:
+                cell = row.cells[-1]
+                cell.content.controls[1].name = 'delete'
+                cell.content.controls[1].size = 18
+                cell.on_tap = self._handle_deleting if enable else None
+            self.update()
+    
     def _create_columns(self) -> list[ft.DataColumn]:
         return [
             ft.DataColumn(
@@ -167,4 +182,24 @@ class AccountsTable(ft.DataTable):
         snackbar.open = True
         page: ft.Page = event.page
         page.overlay.append(snackbar)
+        page.update()
+
+    # Manejo del evento de eliminación
+
+    def _handle_deleting(self, event: ft.ControlEvent):
+        cell: ft.DataCell = event.control
+        self._show_delete_alert(event)
+    
+    def _show_delete_alert(self, event: ft.ControlEvent):
+        page: ft.Page = event.page
+        cell: ft.DataCell = event.control
+        delete_alert = ConfirmationForm(
+            title='Elminar cuenta',
+            content=[
+                ft.Text('Confirma la eliminación del usuario:'),
+                ft.Text(f'{cell.data}')
+            ],
+        )
+        page.overlay.append(delete_alert)
+        delete_alert.open = True
         page.update()

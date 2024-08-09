@@ -53,7 +53,7 @@ class BaseForm(ft.AlertDialog):
     
 class ConfirmationForm(BaseForm):
 
-    def __init__(self, title: str, content: list[ft.Control], on_confirm=None, on_cancel=None):
+    def __init__(self, title: str, content: list[ft.Control], on_confirm=None, on_cancel=None, on_dismiss=None):
         super().__init__()
         self._on_confirm = on_confirm
         self._on_cancel = on_cancel
@@ -69,7 +69,7 @@ class ConfirmationForm(BaseForm):
                 on_click=self._on_confirm
             ),
         ]
-        self.on_dismiss = self._on_cancel
+        self.on_dismiss = on_dismiss
 
     @property
     def on_confirm(self):

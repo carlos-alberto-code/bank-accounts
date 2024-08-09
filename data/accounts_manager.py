@@ -55,7 +55,7 @@ class Customer:
         return f"{self.nombres.title()} {self.apellido_paterno.capitalize()} {self.apellido_materno.capitalize()}"
     
     def __repr__(self) -> str:
-        return f'Customer(fullname{self.full_name})'
+        return f'Customer(fullname="{self.full_name})"'
 
 class AccountsManager:
     _instance = None

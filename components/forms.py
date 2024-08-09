@@ -67,8 +67,9 @@ class ConfirmationForm(BaseForm):
             self.factory.create_elevated_button(
                 text='Confirmar', icon=ft.icons.SAVE,
                 on_click=self._on_confirm
-            )
+            ),
         ]
+        self.on_dismiss = self._on_cancel
 
     @property
     def on_confirm(self):

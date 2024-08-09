@@ -1,6 +1,7 @@
 from typing import Optional
 import flet as ft
 from data.accounts_manager import Customer
+from data.accounts_manager import AccountsManager
 from components.forms import ConfirmationForm
 
 def _create_snackbar(message: str) -> ft.SnackBar:
@@ -72,7 +73,7 @@ class AccountsTable(ft.DataTable):
         self._set_deleting(False)
     
     def _set_deleting(self, enable: bool) -> None:
-        if self.rows:
+        if self.rows and enable:
             for row in self.rows:
                 cell = row.cells[-1]
                 cell.content.controls[1].name = 'delete'
@@ -97,7 +98,7 @@ class AccountsTable(ft.DataTable):
                     self._create_data_cell(customer.apellido_paterno, 'apellido paterno', customer),
                     self._create_data_cell(customer.apellido_materno, 'apellido materno', customer),
                     self._create_data_cell(customer.nombres, 'nombres', customer),
-                    self._create_copy_cell(customer.numero_de_cuenta)
+                    self._create_copy_cell(customer.numero_de_cuenta, {'column': 'numero de cuenta', 'value': customer.numero_de_cuenta, 'row': customer}),
                 ]
             ) for customer in self.customers
         ]
@@ -108,12 +109,13 @@ class AccountsTable(ft.DataTable):
             data={'column': column_name, 'value': value, 'row': customer}
         )
 
-    def _create_copy_cell(self, value: str) -> ft.DataCell:
+    def _create_copy_cell(self, value: str, data: dict) -> ft.DataCell:
         return ft.DataCell(
             ft.Row(
                 [ft.Text(value, size=13), ft.Icon(ft.icons.COPY, size=13)],
             ),
             on_tap=self._handle_on_copy,
+            data=data
         )
     
     def _handle_on_sort(self, event: ft.ControlEvent) -> None:
@@ -158,6 +160,7 @@ class AccountsTable(ft.DataTable):
             on_confirm=self._handle_on_confirm_alert,
             on_cancel=self._handle_on_cancel_alert,
         )
+        self._change_alert_color(confirmation, 'blue')
         page.overlay.append(confirmation)
         confirmation.open = True
         page.update()
@@ -193,13 +196,38 @@ class AccountsTable(ft.DataTable):
     def _show_delete_alert(self, event: ft.ControlEvent):
         page: ft.Page = event.page
         cell: ft.DataCell = event.control
-        delete_alert = ConfirmationForm(
+        if cell.data:
+            self._customer_to_deleting: Customer = cell.data['row']
+        self._delete_alert = ConfirmationForm(
             title='Elminar cuenta',
             content=[
                 ft.Text('Confirma la eliminación del usuario:'),
-                ft.Text(f'{cell.data}')
+                ft.Text(f'- {self._customer_to_deleting.full_name}'),
+                ft.Text(f'- Número de cuenta: {self._customer_to_deleting.numero_de_cuenta}'),
             ],
+            on_cancel=self._handel_on_delete_cancel,
+            on_confirm=self._handel_on_delete_confirm,
         )
-        page.overlay.append(delete_alert)
-        delete_alert.open = True
+        self._change_alert_color(self._delete_alert, 'red')
+        page.overlay.append(self._delete_alert)
+        self._delete_alert.open = True
         page.update()
+    
+    def _change_alert_color(self, alert: ConfirmationForm, color: str) -> None:
+        alert.shadow_color = color
+        alert.surface_tint_color = color
+        
+    def _handel_on_delete_cancel(self, event: ft.ControlEvent) -> None:
+        self._delete_alert.open = False
+        event.page.update()
+    
+    def _handel_on_delete_confirm(self, event: ft.ControlEvent) -> None:
+        # self._delete_alert.open = False
+        accounts = AccountsManager()
+        accounts.remove(str(self._customer_to_deleting.numero_de_cuenta))
+        self._delete_alert.title = None
+        self._delete_alert.content = ft.Text('Usuario eliminado correctamente')
+        self._delete_alert.actions = [ft.ElevatedButton('Ok', on_click=self._handel_on_delete_cancel)]
+        self._delete_alert.update()
+        self.customers = accounts.get_all()
+        self.update()

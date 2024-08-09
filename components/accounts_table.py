@@ -26,22 +26,6 @@ class AccountsTable(ft.DataTable):
         )
         self._customer_selected: Optional[Customer] = None
         self._column_selected: Optional[str] = None
-    
-    @property
-    def customer_selected(self) -> Customer | None:
-        return self._customer_selected
-
-    @customer_selected.setter
-    def customer_selected(self, customer: Customer) -> None:
-        self._customer_selected = customer
-    
-    @property
-    def column_selected(self) -> str | None:
-        return self._column_selected
-    
-    @column_selected.setter
-    def column_selected(self, column_name: str) -> None:
-        self._column_selected = column_name
 
     @property
     def customers(self) -> list[Customer]:

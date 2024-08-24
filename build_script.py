@@ -9,6 +9,7 @@ PyInstaller.__main__.run([
     '--name=bank_accounts',
     '--windowed',
     f'--add-data={flet_path};flet',
+    '--add-data=data/accounts.csv;data',
     '--additional-hooks-dir=.',
     '--clean',
 ])

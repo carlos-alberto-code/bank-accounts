@@ -1,7 +1,17 @@
-import os
+import os, sys
 import pandas as pd
 from unidecode import unidecode
 from typing import Dict, List, Generator
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS # type: ignore
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 class AccountsDataFrame:
     _instance = None
@@ -13,7 +23,8 @@ class AccountsDataFrame:
 
     def __init__(self) -> None:
         if not hasattr(self, '_initialized'):
-            self._filepath = 'data/accounts.csv'
+            self._filepath = resource_path("data/accounts.csv")
+            print('Intentando abrir archivo:', self._filepath)
             if not os.path.exists(self._filepath):
                 raise FileNotFoundError(f"Archivo no encontrado en el directorio: {self._filepath}\n")
             try:

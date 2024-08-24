@@ -23,12 +23,13 @@ class AccountsViewController:
                     ft.Row(
                         [
                             add_button,
+                            restart_button,
                             delete_button,
                         ],
                         alignment=ft.MainAxisAlignment.CENTER
                     ),
                     ft.Row(
-                        [searcher, restart_button],
+                        [searcher],
                         alignment=ft.MainAxisAlignment.CENTER
                     )
                 ]

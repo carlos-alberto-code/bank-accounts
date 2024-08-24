@@ -35,10 +35,10 @@ class AccountsTable(ft.DataTable):
     def customers(self, customers: list[Customer]) -> None:
         self._customers = customers
         self.rows = self._create_rows()
-    
+
     def active_editing(self) -> None:
         self._set_editing(True)
-    
+
     def disable_editing(self) -> None:
         self._set_editing(False)
 
@@ -49,13 +49,13 @@ class AccountsTable(ft.DataTable):
                     cell.show_edit_icon = enable
                     cell.on_tap = self._handle_on_cell_click if enable else None
             self.update()
-    
+
     def active_deleting(self) -> None:
         self._set_deleting(True)
-    
+
     def disable_deleting(self) -> None:
         self._set_deleting(False)
-    
+
     def _set_deleting(self, enable: bool) -> None:
         if self.rows and enable:
             for row in self.rows:
@@ -64,7 +64,7 @@ class AccountsTable(ft.DataTable):
                 cell.content.controls[1].size = 18
                 cell.on_tap = self._handle_deleting if enable else None
             self.update()
-    
+
     def _create_columns(self) -> list[ft.DataColumn]:
         return [
             ft.DataColumn(
@@ -79,14 +79,14 @@ class AccountsTable(ft.DataTable):
         return [
             ft.DataRow(
                 cells=[
+                    self._create_data_cell(customer.nombres, 'nombres', customer),
                     self._create_data_cell(customer.apellido_paterno, 'apellido paterno', customer),
                     self._create_data_cell(customer.apellido_materno, 'apellido materno', customer),
-                    self._create_data_cell(customer.nombres, 'nombres', customer),
                     self._create_copy_cell(customer.numero_de_cuenta, {'column': 'numero de cuenta', 'value': customer.numero_de_cuenta, 'row': customer}),
                 ]
             ) for customer in self.customers
         ]
-    
+
     def _create_data_cell(self, value: str, column_name: str, customer: Customer) -> ft.DataCell:
         return ft.DataCell(
             ft.Text(value, size=13),
@@ -101,7 +101,7 @@ class AccountsTable(ft.DataTable):
             on_tap=self._handle_on_copy,
             data=data
         )
-    
+
     def _handle_on_sort(self, event: ft.ControlEvent) -> None:
         sorts = {
             'apellido paterno': lambda customer: customer.apellido_paterno,
@@ -116,7 +116,7 @@ class AccountsTable(ft.DataTable):
             self._customers.sort(key=sort, reverse=self._sort_columns_states[col_name])
             self.rows = self._create_rows()
             self.update()
-    
+
     def _create_text_field(self, value: str, on_submit=None, on_blur=None) -> ft.TextField:
         return ft.TextField(
             value=value,
@@ -129,13 +129,13 @@ class AccountsTable(ft.DataTable):
             autofocus=True,
             on_blur=on_blur,
         )
-    
+
     def _handle_on_cancel_alert(self, event: ft.ControlEvent) -> None:
         self.disable_editing()
 
     def _handle_on_confirm_alert(self, event: ft.ControlEvent):
         pass
-    
+
     def _show_alert_message(self, event: ft.ControlEvent) -> None:
         page: ft.Page = event.page
         confirmation = ConfirmationForm(
@@ -151,7 +151,7 @@ class AccountsTable(ft.DataTable):
 
     def _handle_on_submit(self, event: ft.ControlEvent) -> None:
         self._show_alert_message(event)
-        
+
     def _handle_on_cell_click(self, event: ft.ControlEvent) -> None:
         self._current_cell: ft.DataCell = event.control
         current_text_value: str = event.control.content.value
@@ -163,7 +163,7 @@ class AccountsTable(ft.DataTable):
         page: ft.Page = event.page
         page.set_clipboard(str(event.control.content.controls[0].value))
         self._show_message(event)
-    
+
     def _show_message(self, event: ft.ControlEvent) -> None:
         snackbar = _create_snackbar('Número de cuenta copiado!')
         snackbar.open = True
@@ -176,7 +176,7 @@ class AccountsTable(ft.DataTable):
     def _handle_deleting(self, event: ft.ControlEvent):
         cell: ft.DataCell = event.control
         self._show_delete_alert(event)
-    
+
     def _show_delete_alert(self, event: ft.ControlEvent):
         page: ft.Page = event.page
         cell: ft.DataCell = event.control
@@ -196,15 +196,15 @@ class AccountsTable(ft.DataTable):
         page.overlay.append(self._delete_alert)
         self._delete_alert.open = True
         page.update()
-    
+
     def _change_alert_color(self, alert: ConfirmationForm, color: str) -> None:
         alert.shadow_color = color
         alert.surface_tint_color = color
-        
+
     def _handel_on_delete_cancel(self, event: ft.ControlEvent) -> None:
         self._delete_alert.open = False
         event.page.update()
-    
+
     def _handel_on_delete_confirm(self, event: ft.ControlEvent) -> None:
         # self._delete_alert.open = False
         accounts = AccountsManager()

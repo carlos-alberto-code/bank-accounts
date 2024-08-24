@@ -28,7 +28,7 @@ class AccountsDataFrame:
             raise ValueError("Datos de cuenta incompletos")
         if account_data['Numero de Cuenta'] in self._df['Numero de Cuenta'].astype(str).values:
             raise ValueError(f"Numero de Cuenta: {account_data['Numero de Cuenta']} ya existe en la base de datos\n")
-        
+
         new_row = pd.DataFrame([account_data])
         self._df = pd.concat([self._df, new_row], ignore_index=True)
         self._save_to_csv()
@@ -38,7 +38,7 @@ class AccountsDataFrame:
         if account_number not in self._df['Numero de Cuenta'].values:
             raise ValueError(f"Numero de Cuenta: {account_number} no existe en la base de datos\n")
         return self._df[self._df['Numero de Cuenta'] == account_number].iloc[0]
-    
+
     def exists(self, account_number: str) -> bool:
         self._df['Numero de Cuenta'] = self._df['Numero de Cuenta'].astype(str)
         return account_number in self._df['Numero de Cuenta'].values
@@ -75,18 +75,22 @@ class AccountsDataFrame:
     def search(self, search_term: str) -> pd.DataFrame:
         def normalize_text(text: str) -> str:
             return unidecode(text).lower()
-        
+
         normalized_search_term = normalize_text(search_term)
         search_results = self._df[self._df.apply(
             lambda row: row.astype(str).apply(normalize_text).str.contains(normalized_search_term, na=False).any(),
             axis=1
         )]
         return search_results
-    
+
     @property
     def columns(self) -> List[str]:
         return list(self._df.columns)
-    
+
     @property
     def rows(self) -> Generator[pd.Series, None, None]:
         return (row for _, row in self._df.iterrows())
+
+    @property
+    def exist_file(self) -> bool:
+        return os.path.exists(self._filepath)

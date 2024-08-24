@@ -3,7 +3,7 @@ import flet as ft
 from components.accounts_table    import AccountsTable
 from components.forms             import NewCustomerForm
 from data.accounts_manager        import AccountsManager
-from components.appbar_actions    import add_button, delete_button, edit_button, searcher
+from components.appbar_actions    import add_button, delete_button, searcher, import_data_button
 
 class AccountsViewController:
 
@@ -15,7 +15,15 @@ class AccountsViewController:
             column_names=self.accounts.columns,
             customers=self.accounts.get_all()
         )
-    
+        self.import_button = ft.PopupMenuButton()
+        if self.accounts.exists_file:
+            import_data_button.on_click = self.handle_on_import_data_button_click
+            self.import_button.icon = ft.icons.MORE_VERT
+            self.import_button.tooltip = 'Opciones'
+            self.import_button.items = [import_data_button]
+        # if self.accounts.exists_file:
+        #     self.import_button.visible = False
+
     def _setup_appbar(self):
         self.page.appbar = ft.AppBar(
             title=ft.Column(
@@ -23,8 +31,8 @@ class AccountsViewController:
                     ft.Row(
                         [
                             add_button,
-                            edit_button,
                             delete_button,
+                            self.import_button
                         ],
                         alignment=ft.MainAxisAlignment.CENTER
                     ),
@@ -39,27 +47,25 @@ class AccountsViewController:
         )
 
     def setup_components(self):
-        add_button.on_click     = self._handle_on_add_button_click
-        edit_button.on_click    = self._handle_on_edit_button_click
-        delete_button.on_click  = self._handle_on_delete_button_click
-        searcher.on_change      = self._handle_on_searcher_change
+        searcher.on_change          = self._handle_on_searcher_change
+        add_button.on_click         = self._handle_on_add_button_click
+        delete_button.on_click      = self._handle_on_delete_button_click
         self._setup_appbar()
         self.page.overlay.append(self.new_customer_form)
         self.page.add(self.table_accounts)
+
+    def handle_on_import_data_button_click(self, event: ft.ControlEvent):
+        print('Importar datos')
 
     def _handle_on_add_button_click(self, event: ft.ControlEvent):
         self.new_customer_form.reset_values()
         self.new_customer_form.open = True
         self.page.update()
-    
-    def _handle_on_edit_button_click(self, event: ft.ControlEvent):
-        self.table_accounts.active_editing()
-        self.page.update()
 
     def _handle_on_delete_button_click(self, event: ft.ControlEvent):
         self.table_accounts.active_deleting()
         self.page.update()
-    
+
     def _handle_on_searcher_change(self, event: ft.ControlEvent):
         text = str(searcher.value)
         results = self.accounts.search(text)

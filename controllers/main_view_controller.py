@@ -3,7 +3,7 @@ import flet as ft
 from components.accounts_table    import AccountsTable
 from components.forms             import NewCustomerForm
 from data.accounts_manager        import AccountsManager
-from components.appbar_actions    import add_button, delete_button, searcher, import_data_button
+from components.appbar_actions    import add_button, delete_button, searcher
 
 class AccountsViewController:
 
@@ -15,14 +15,6 @@ class AccountsViewController:
             column_names=self.accounts.columns,
             customers=self.accounts.get_all()
         )
-        self.import_button = ft.PopupMenuButton()
-        if self.accounts.exists_file:
-            import_data_button.on_click = self.handle_on_import_data_button_click
-            self.import_button.icon = ft.icons.MORE_VERT
-            self.import_button.tooltip = 'Opciones'
-            self.import_button.items = [import_data_button]
-        # if self.accounts.exists_file:
-        #     self.import_button.visible = False
 
     def _setup_appbar(self):
         self.page.appbar = ft.AppBar(
@@ -32,7 +24,6 @@ class AccountsViewController:
                         [
                             add_button,
                             delete_button,
-                            self.import_button
                         ],
                         alignment=ft.MainAxisAlignment.CENTER
                     ),

@@ -18,7 +18,7 @@ class FormControlsFactory:
             [ft.Icon(icon), ft.Text(text)],
             alignment=ft.MainAxisAlignment.START,
         )
-    
+
     def create_text_field(self, label: str, input_filter: ft.InputFilter, autofocus: bool = False, visible: bool = True, on_change=None) -> ft.TextField:
         return ft.TextField(
             label=label,
@@ -46,11 +46,11 @@ class BaseForm(ft.AlertDialog):
     def __init__(self):
         super().__init__()
         self._controls_factory = FormControlsFactory()
-    
+
     @property
     def factory(self):
         return self._controls_factory
-    
+
 class ConfirmationForm(BaseForm):
 
     def __init__(self, title: str, content: list[ft.Control], on_confirm=None, on_cancel=None, on_dismiss=None):
@@ -74,11 +74,11 @@ class ConfirmationForm(BaseForm):
     @property
     def on_confirm(self):
         return self._on_confirm
-    
+
     @on_confirm.setter
     def on_confirm(self, event_function: ft.ControlEvent):
         self._on_confirm = event_function
-    
+
     @property
     def on_cancel(self):
         return self._on_cancel
@@ -86,7 +86,7 @@ class ConfirmationForm(BaseForm):
     @on_cancel.setter
     def on_cancel(self, event_function: ft.ControlEvent):
         self._on_cancel = event_function
-    
+
 class NewCustomerForm(BaseForm):
 
     def __init__(self):
@@ -103,7 +103,7 @@ class NewCustomerForm(BaseForm):
         )
         self._names = self.factory.create_text_field(
             label='Nombre(s)',
-            input_filter=ft.InputFilter(regex_string=r'^[A-Za-z\s]+$'),
+            input_filter=ft.InputFilter(regex_string=r'^[A-Za-z\s]{1,30}$'),
             autofocus=True,
             on_change=self._handle_on_change
         )
@@ -138,17 +138,17 @@ class NewCustomerForm(BaseForm):
             ),
             self._save_button
         ]
-    
+
     def reset_values(self):
         self._psurname.value = ''
         self._msurname.value = ''
         self._names.value = ''
         self._account.value = ''
-    
+
     def _reset_controls(self):
         self._save_button.disabled = True
         self._save_button.update()
-        
+
     def _handle_on_change(self, event: ft.ControlEvent):
         if self._data_exist:
             self._save_button.disabled = False
@@ -156,19 +156,19 @@ class NewCustomerForm(BaseForm):
         else:
             self._save_button.disabled = True
             self._save_button.update()
-    
+
     def _handle_on_cancel_click(self, event: ft.ControlEvent):
         self.reset_values()
         self._reset_controls()
         self.open = False
         event.page.update()
-    
+
     def _handle_on_clean_click(self, event: ft.ControlEvent):
         self.reset_values()
         self._reset_controls()
         self._names.focus()
         self.update()
-    
+
     def _handle_on_save_click(self, event: ft.ControlEvent):
         page: ft.Page = event.page
         number = str(self._account.value)
@@ -179,17 +179,17 @@ class NewCustomerForm(BaseForm):
             page.update()
         else:
             self._open_confirmation_alert(event)
-    
+
     def _account_exist(self, account: str) -> bool:
         return True if accounts.exists(account) else False
-    
+
     def _open_confirmation_alert(self, event: ft.ControlEvent):
         page: ft.Page = event.page
         self.customer = Customer(
             apellido_paterno=str(self._psurname.value),
             apellido_materno=str(self._msurname.value),
-            nombres=str(self._names.value),
-            numero_de_cuenta=str(self._account.value)
+            nombres=str(self._names.value).strip(),
+            numero_de_cuenta=str(self._account.value),
         )
         self.alert_confirmation = ConfirmationForm(
             title='Confirma los datos',
@@ -209,7 +209,7 @@ class NewCustomerForm(BaseForm):
         page.overlay.append(self.alert_confirmation)
         self.alert_confirmation.open = True
         page.update()
-    
+
     def _handle_on_confirm_confirmation_alert(self, event: ft.ControlEvent):
         accounts.add(self.customer)
         self.alert_confirmation.title = None
@@ -259,10 +259,10 @@ class EditCustomerForm(BaseForm):
             ),
             self._search_button
         ]
-    
+
     def _exist_data_in_txt_fld(self) -> bool:
         return True if self._account.value else False
-    
+
     def _handle_on_change(self, event: ft.ControlEvent):
         if self._exist_data_in_txt_fld:
             self._search_button.disabled = False
@@ -270,21 +270,21 @@ class EditCustomerForm(BaseForm):
         else:
             self._search_button.disabled = True
             self._search_button.update()
-    
+
     def _handle_on_cancel_click(self, event: ft.ControlEvent):
         self._account.value = ''
         self._search_button.disabled = True
         self._search_button.update()
         self.open = False
         event.page.update()
-    
+
     def _handle_on_clean_click(self, event: ft.ControlEvent):
         self._account.value = ''
         self._search_button.disabled = True
         self._search_button.update()
         self._account.focus()
         self.update()
-    
+
     def _account_exist(self, account: str) -> bool:
         return True if accounts.exists(account) else False
 
@@ -296,5 +296,4 @@ class EditCustomerForm(BaseForm):
             pass
         else:
             self._account.error_text = 'El número de cuenta no existe!'
-        
-    
+

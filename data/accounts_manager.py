@@ -7,9 +7,9 @@ from data.accounts_dataframe import AccountsDataFrame
 class Customer:
 
     def __init__(self, apellido_paterno: str, apellido_materno: str, nombres: str, numero_de_cuenta: str) -> None:
-        self._apellido_paterno: str = apellido_paterno
-        self._apellido_materno: str = apellido_materno
-        self._nombres: str = nombres
+        self._apellido_paterno: str = apellido_paterno.upper()
+        self._apellido_materno: str = apellido_materno.upper()
+        self._nombres: str = nombres.upper()
         self._numero_de_cuenta: str = numero_de_cuenta
         self._data = {
             'Apellido Paterno': self.apellido_paterno,
@@ -52,7 +52,7 @@ class Customer:
 
     @property
     def full_name(self) -> str:
-        return f"{self.nombres.title()} {self.apellido_paterno.capitalize()} {self.apellido_materno.capitalize()}"
+        return f"{self.nombres} {self.apellido_paterno} {self.apellido_materno}"
 
     def __repr__(self) -> str:
         return f'Customer(fullname="{self.full_name})"'

@@ -1,5 +1,5 @@
-from typing import Optional
 import flet as ft
+from typing import Optional
 from data.accounts_manager import Customer
 from data.accounts_manager import AccountsManager
 from components.forms import ConfirmationForm

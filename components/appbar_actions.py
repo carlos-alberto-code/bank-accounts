@@ -9,6 +9,10 @@ searcher = ft.TextField(
     text_size=13,
     label_style=ft.TextStyle(size=13),
 )
+restart_button = ft.IconButton(
+    ft.icons.REFRESH, icon_size=23,
+    tooltip='Actualizar',
+)
 add_button = ft.IconButton(
     ft.icons.ADD, icon_size=20,
     tooltip='Registrar',

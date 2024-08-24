@@ -61,7 +61,8 @@ class AccountsTable(ft.DataTable):
             for row in self.rows:
                 cell = row.cells[-1]
                 cell.content.controls[1].name = 'delete'
-                cell.content.controls[1].size = 18
+                cell.content.controls[1].size = 19
+                cell.content.controls[1].color = 'red'
                 cell.on_tap = self._handle_deleting if enable else None
             self.update()
 
